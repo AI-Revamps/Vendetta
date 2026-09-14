@@ -27,6 +27,7 @@ $onderdelen = [
     'begin'    => 'Hoe je begint',
     'rangen'   => 'Rangen',
     'geld'     => 'Geld verdienen',
+    'klikmissies' => 'Klikmissies',
     'moord'    => 'Moord en getuigen',
     'dood'     => 'Doodgaan',
     'accounts' => 'Accounts',
@@ -136,6 +137,23 @@ echo '<h3>De bank</h3>';
 echo '<p>Geld op de bank raak je niet kwijt als iemand je berooft, maar wél als je vermoord '
    . 'wordt. Zet daarom iemand in je testament: die erft de helft van je banksaldo en je '
    . 'wagens.</p>';
+
+panel_close();
+
+// --- Klikmissies -------------------------------------------------------------
+
+panel_open('Klikmissies', 'klikmissies');
+
+echo '<p>Op de pagina <a href="' . e(url('klikmissies.php')) . '">Klikmissies</a> vind je '
+   . 'stemlinks naar externe toplijsten. Stem daar op de website en je krijgt een beloning: '
+   . 'geld op zak, geld op de bank, diamanten, of een combinatie daarvan — dat verschilt per '
+   . 'link.</p>';
+
+echo '<p>Sommige links bevestigen je stem automatisch; de beloning komt dan vanzelf. Bij '
+   . 'andere klik je na het stemmen zelf op "Ik heb gestemd" — dat kan pas na een korte '
+   . 'wachttijd, zodat je ook echt eerst gestemd hebt.</p>';
+
+echo '<p>Elke link heeft zijn eigen afkoeltijd voordat je er opnieuw voor beloond kunt worden.</p>';
 
 panel_close();
 
