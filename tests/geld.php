@@ -380,6 +380,63 @@ check('duurste voertuig kost hoogstens €200.000',
     (int) $voertuigen[count($voertuigen) - 1]['aprijs'] <= 200000,
     (string) $voertuigen[count($voertuigen) - 1]['aprijs']);
 
+// --- Klikmissies -------------------------------------------------------------
+
+kop('klikmissies: callback beloont precies het ingestelde bedrag, en niet twee keer binnen de cooldown');
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+$db->exec(
+    "INSERT INTO klikmissies
+        (naam, url, heeft_callback, callback_geheim, cooldown_seconden,
+         beloning_zak, beloning_bank, beloning_diamanten, actief)
+     VALUES ('Testlijst', 'http://127.0.0.1:1/stem?ref={login}', 1, 'geheimtoken123', 86400,
+             5000, 2000, 3, 1)"
+);
+$missieId = (int) $db->lastInsertId();
+
+$db->exec("UPDATE users SET zak=0, bank=0, diamanten=0 WHERE login='Speler'");
+
+$r = haal('klikmissies-callback.php?id=' . $missieId . '&geheim=geheimtoken123&login=Speler');
+$u = $db->query("SELECT zak, bank, diamanten FROM users WHERE login='Speler'")->fetch();
+
+check('callback antwoordt OK', trim($r['body']) === 'OK', $r['body']);
+check('zak precies 5.000 hoger', (int) $u['zak'] === 5000, 'zak ' . $u['zak']);
+check('bank precies 2.000 hoger', (int) $u['bank'] === 2000, 'bank ' . $u['bank']);
+check('diamanten precies 3 hoger', (int) $u['diamanten'] === 3, 'diamanten ' . $u['diamanten']);
+
+$aantalLog = (int) $db->query(
+    "SELECT COUNT(*) FROM klikmissies_log
+      WHERE klikmissie_id={$missieId} AND login='Speler' AND methode='callback'"
+)->fetchColumn();
+check('er staat precies één logregel', $aantalLog === 1, (string) $aantalLog);
+
+// Een tweede callback binnen de cooldown mag niets meer bijschrijven.
+$r2 = haal('klikmissies-callback.php?id=' . $missieId . '&geheim=geheimtoken123&login=Speler');
+$u2 = $db->query("SELECT zak, bank, diamanten FROM users WHERE login='Speler'")->fetch();
+
+check('tweede callback binnen de cooldown wordt geweigerd',
+    str_starts_with(trim($r2['body']), 'FOUT'), $r2['body']);
+check('en schrijft niets extra bij', $u2 === $u, json_encode($u2));
+
+kop('klikmissies: een verkeerd geheim of onbekende speler beloont niets');
+
+$db->exec("UPDATE users SET zak=0, bank=0, diamanten=0 WHERE login='Speler'");
+$db->exec("DELETE FROM klikmissies_log");
+
+$r3 = haal('klikmissies-callback.php?id=' . $missieId . '&geheim=verkeerdtoken&login=Speler');
+$u3 = $db->query("SELECT zak, bank, diamanten FROM users WHERE login='Speler'")->fetch();
+
+check('verkeerd geheim wordt geweigerd', str_starts_with(trim($r3['body']), 'FOUT'), $r3['body']);
+check('niets bijgeschreven bij een verkeerd geheim',
+    (int) $u3['zak'] === 0 && (int) $u3['bank'] === 0 && (int) $u3['diamanten'] === 0, json_encode($u3));
+
+$r4 = haal('klikmissies-callback.php?id=' . $missieId . '&geheim=geheimtoken123&login=Onbekendespeler');
+check('onbekende speler wordt geweigerd', str_starts_with(trim($r4['body']), 'FOUT'), $r4['body']);
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+
 // --- Cron ------------------------------------------------------------------
 
 kop('cron: alle taken draaien');

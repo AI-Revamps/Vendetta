@@ -33,6 +33,7 @@ const ADS_OVERSLAAN = [
     'cron.php',
     'login.php',
     'register.php',
+    'klikmissies-callback.php', // machine-naar-machine, mag nooit een advertentie tonen
 ];
 
 // --- Instellingen -----------------------------------------------------------
