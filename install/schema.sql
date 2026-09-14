@@ -530,6 +530,42 @@ CREATE TABLE IF NOT EXISTS `news` (
   KEY `tijd` (`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ------------------------------------------------------------ klikmissies
+
+-- Door de admin beheerde links naar externe toplijsten/stemsites, met een
+-- optionele automatische callback, een afkoeltijd en een beloning.
+CREATE TABLE IF NOT EXISTS `klikmissies` (
+  `id`                 int unsigned NOT NULL AUTO_INCREMENT,
+  `naam`               varchar(100) NOT NULL DEFAULT '',
+  `omschrijving`       varchar(255) NOT NULL DEFAULT '',
+  `url`                varchar(500) NOT NULL DEFAULT '', -- mag `{login}` bevatten
+  `heeft_callback`     tinyint unsigned NOT NULL DEFAULT 0,
+  `callback_geheim`    varchar(64) NOT NULL DEFAULT '',
+  `wachttijd_klik`     int unsigned NOT NULL DEFAULT 20,    -- seconden; alleen zonder callback
+  `cooldown_seconden`  int unsigned NOT NULL DEFAULT 86400,
+  `beloning_zak`       bigint NOT NULL DEFAULT 0,
+  `beloning_bank`      bigint NOT NULL DEFAULT 0,
+  `beloning_diamanten` int unsigned NOT NULL DEFAULT 0,
+  `actief`             tinyint unsigned NOT NULL DEFAULT 1,
+  `volgorde`           int unsigned NOT NULL DEFAULT 0,
+  `aangemaakt_op`      datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `actief` (`actief`, `volgorde`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Logboek van uitgekeerde klikmissie-beloningen. Bepaalt de cooldown per
+-- speler per missie en dient als overzicht voor de admin.
+CREATE TABLE IF NOT EXISTS `klikmissies_log` (
+  `id`             int unsigned NOT NULL AUTO_INCREMENT,
+  `klikmissie_id`  int unsigned NOT NULL,
+  `login`          varchar(16) NOT NULL,
+  `tijd`           datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `methode`        enum('callback','zelf') NOT NULL,
+  `ip`             varchar(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `cooldown` (`klikmissie_id`, `login`, `tijd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ---------------------------------------------------------------- beheer
 
 CREATE TABLE IF NOT EXISTS `bans` (
