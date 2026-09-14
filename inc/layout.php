@@ -61,6 +61,7 @@ function menu_groups(array $user): array
             'hitlist.php?watch'         => 'Premielijst',
             'members.php?filter=levend' => 'Spelers',
             'premium.php'               => 'Premium',
+            'klikmissies.php'           => 'Klikmissies',
         ],
         'Plaatsen' => [
             'shop.php'            => 'Winkel / Markt',
@@ -97,6 +98,12 @@ function menu_groups(array $user): array
             'loterij.php'  => 'Loterij',
         ],
     ];
+
+    $beschikbaar = status_summary($user)['klikmissies_beschikbaar'] ?? 0;
+
+    if ($beschikbaar > 0) {
+        $groepen['Status']['klikmissies.php'] .= ' (' . num(min(99, $beschikbaar)) . ')';
+    }
 
     // Familie-items hangen af van lidmaatschap en rang binnen de familie.
     $fam  = (string) ($user['famillie'] ?? '');
@@ -170,15 +177,24 @@ function status_summary(array $user): array
               WHERE `to` = :login AND `read` = 0)                                AS ongelezen,
             (SELECT COUNT(*) FROM `users`
               WHERE `online` > DATE_SUB(NOW(), INTERVAL 15 MINUTE)
-                AND `status` = 'levend')                                         AS online",
-        ['xp' => (int) $user['xp'], 'login' => $user['login']]
+                AND `status` = 'levend')                                         AS online,
+            (SELECT COUNT(*) FROM `klikmissies` k
+              WHERE k.`actief` = 1
+                AND NOT EXISTS (
+                  SELECT 1 FROM `klikmissies_log` l
+                   WHERE l.`klikmissie_id` = k.`id` AND l.`login` = :klogin
+                     AND l.`tijd` > DATE_SUB(NOW(), INTERVAL k.`cooldown_seconden` SECOND)
+                )
+            )                                                                    AS klikmissies_beschikbaar",
+        ['xp' => (int) $user['xp'], 'login' => $user['login'], 'klogin' => $user['login']]
     ) ?? [];
 
     $onthouden = [
-        'positie'   => (int) ($rij['positie'] ?? 0),
-        'spelers'   => (int) ($rij['spelers'] ?? 0),
-        'ongelezen' => (int) ($rij['ongelezen'] ?? 0),
-        'online'    => (int) ($rij['online'] ?? 0),
+        'positie'                 => (int) ($rij['positie'] ?? 0),
+        'spelers'                 => (int) ($rij['spelers'] ?? 0),
+        'ongelezen'               => (int) ($rij['ongelezen'] ?? 0),
+        'online'                  => (int) ($rij['online'] ?? 0),
+        'klikmissies_beschikbaar' => (int) ($rij['klikmissies_beschikbaar'] ?? 0),
     ];
 
     return $onthouden;

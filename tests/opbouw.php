@@ -174,6 +174,31 @@ check('hoogstens één groep open', count($blokken[0]) === 1, count($blokken[0])
 check('zichtbare items blijven beperkt', $zichtbaar <= 15, $zichtbaar . ' items');
 check('alle groepen staan er nog', substr_count($html, '<summary>') >= 6);
 
+// --- Klikmissies: badge in het menu ------------------------------------------
+
+kop('klikmissies: het zijmenu toont hoeveel klikmissies beschikbaar zijn');
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+$db->exec(
+    "INSERT INTO klikmissies (naam, url, cooldown_seconden, actief)
+     VALUES ('Testlijst', 'https://voorbeeld.test/stem?ref={login}', 86400, 1)"
+);
+$missieId = (int) $db->lastInsertId();
+
+$html = haal('home.php')['body'];
+check('badge toont 1 beschikbare klikmissie', str_contains($html, 'Klikmissies (1)'), '');
+
+$db->exec("INSERT INTO klikmissies_log (klikmissie_id, login, methode, ip)
+            VALUES ({$missieId}, 'Speler', 'zelf', '127.0.0.1')");
+
+$html2 = haal('home.php')['body'];
+check('badge verdwijnt zodra de cooldown loopt', !str_contains($html2, 'Klikmissies ('), '');
+check('het menu-item zelf blijft gewoon staan', str_contains($html2, '>Klikmissies<'), '');
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+
 $db->exec("UPDATE users SET famillie='', famrang=0, level=1 WHERE login='Speler'");
 
 // --- Onderbalk -------------------------------------------------------------
