@@ -199,6 +199,49 @@ check('het menu-item zelf blijft gewoon staan', str_contains($html2, '>Klikmissi
 $db->exec("DELETE FROM klikmissies_log");
 $db->exec("DELETE FROM klikmissies");
 
+// --- Klikmissies: "nieuw venster" bepaalt target op Stem-link/-knop --------
+
+kop('klikmissies: nieuw_venster bepaalt of Stem in een nieuw tabblad opent');
+
+$db->exec(
+    "INSERT INTO klikmissies (naam, url, heeft_callback, nieuw_venster, cooldown_seconden, actief)
+     VALUES
+        ('CallbackNieuw', 'https://voorbeeld.test/a?ref={login}', 1, 1, 86400, 1),
+        ('CallbackZelfde', 'https://voorbeeld.test/b?ref={login}', 1, 0, 86400, 1),
+        ('ZelfNieuw',      'https://voorbeeld.test/c?ref={login}', 0, 1, 86400, 1),
+        ('ZelfZelfde',     'https://voorbeeld.test/d?ref={login}', 0, 0, 86400, 1)"
+);
+
+$html = haal('klikmissies.php')['body'];
+
+/** Knip het stuk pagina voor deze ene missie eruit, op naam. */
+function missieblok(string $html, string $naam): string
+{
+    $start = strpos($html, '>' . $naam . '<');
+    if ($start === false) {
+        return '';
+    }
+    $einde = strpos($html, '</div>', $start);
+    return $einde === false ? '' : substr($html, $start, $einde - $start);
+}
+
+$callbackNieuw  = missieblok($html, 'CallbackNieuw');
+$callbackZelfde = missieblok($html, 'CallbackZelfde');
+$zelfNieuw      = missieblok($html, 'ZelfNieuw');
+$zelfZelfde     = missieblok($html, 'ZelfZelfde');
+
+check('callback + nieuw venster: link heeft target="_blank"',
+    str_contains($callbackNieuw, 'target="_blank"'), $callbackNieuw);
+check('callback + zelfde venster: link heeft geen target="_blank"',
+    $callbackZelfde !== '' && !str_contains($callbackZelfde, 'target="_blank"'), $callbackZelfde);
+check('zelf-bevestigen + nieuw venster: formulier heeft target="_blank"',
+    str_contains($zelfNieuw, 'form method="post" target="_blank"'), $zelfNieuw);
+check('zelf-bevestigen + zelfde venster: formulier heeft geen target="_blank"',
+    $zelfZelfde !== '' && !str_contains($zelfZelfde, 'target="_blank"'), $zelfZelfde);
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+
 $db->exec("UPDATE users SET famillie='', famrang=0, level=1 WHERE login='Speler'");
 
 // --- Onderbalk -------------------------------------------------------------

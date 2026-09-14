@@ -540,6 +540,7 @@ CREATE TABLE IF NOT EXISTS `klikmissies` (
   `omschrijving`       varchar(255) NOT NULL DEFAULT '',
   `url`                varchar(500) NOT NULL DEFAULT '', -- mag `{login}` bevatten
   `heeft_callback`     tinyint unsigned NOT NULL DEFAULT 0,
+  `nieuw_venster`      tinyint unsigned NOT NULL DEFAULT 1, -- Stem-link/-knop opent in een nieuw tabblad
   `callback_geheim`    varchar(64) NOT NULL DEFAULT '',
   `wachttijd_klik`     int unsigned NOT NULL DEFAULT 20,    -- seconden; alleen zonder callback
   `cooldown_seconden`  int unsigned NOT NULL DEFAULT 86400,

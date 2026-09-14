@@ -131,7 +131,8 @@ function toon_missies(array $user): void
             echo '<p>Nog beschikbaar over <strong data-tot="' . $wacht . '">'
                . e(duration($wacht - time())) . '</strong>.</p>';
         } elseif ((int) $missie['heeft_callback'] === 1) {
-            echo '<p><a class="knop" target="_blank" rel="noopener" referrerpolicy="origin" href="'
+            $venster = (int) $missie['nieuw_venster'] === 1 ? ' target="_blank" rel="noopener"' : '';
+            echo '<p><a class="knop"' . $venster . ' referrerpolicy="origin" href="'
                . e(klikmissie_url($missie, $user['login'])) . '">Stem</a> '
                . '<span class="uitleg">De beloning komt automatisch na het stemmen.</span></p>';
         } else {
@@ -147,11 +148,15 @@ function toon_klikflow(array $missie, int $id): void
     $geklikt = $_SESSION['klikmissie_klik'][$id] ?? null;
 
     if ($geklikt === null) {
-        echo '<form method="post">' . csrf_field();
+        $venster = (int) $missie['nieuw_venster'] === 1 ? ' target="_blank"' : '';
+        echo '<form method="post"' . $venster . '>' . csrf_field();
         echo '<input type="hidden" name="actie" value="stem">';
         echo '<input type="hidden" name="id" value="' . $id . '">';
         echo '<button type="submit" class="knop">Stem</button>';
         echo '</form>';
+        if ($venster !== '') {
+            echo '<p class="uitleg">Opent in een nieuw tabblad. Kom hierheen terug om te bevestigen.</p>';
+        }
         return;
     }
 

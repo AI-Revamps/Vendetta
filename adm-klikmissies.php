@@ -68,15 +68,16 @@ function toevoegen(array $user): string
 
     q(
         'INSERT INTO `klikmissies`
-                (`naam`, `omschrijving`, `url`, `heeft_callback`, `callback_geheim`,
+                (`naam`, `omschrijving`, `url`, `heeft_callback`, `nieuw_venster`, `callback_geheim`,
                  `wachttijd_klik`, `cooldown_seconden`,
                  `beloning_zak`, `beloning_bank`, `beloning_diamanten`, `actief`, `volgorde`)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
             $naam,
             mb_substr(trim(post('omschrijving')), 0, 255),
             mb_substr($url, 0, 500),
             post('heeft_callback') === '1' ? 1 : 0,
+            post('nieuw_venster') === '1' ? 1 : 0,
             bin2hex(random_bytes(32)),
             int_input('wachttijd_klik', 20, 0, 3600),
             int_input('cooldown_seconden', 86400, 0, 31_536_000),
@@ -119,7 +120,7 @@ function bewerken(array $user, int $id): string
 
     q(
         'UPDATE `klikmissies`
-            SET `naam` = ?, `omschrijving` = ?, `url` = ?, `heeft_callback` = ?,
+            SET `naam` = ?, `omschrijving` = ?, `url` = ?, `heeft_callback` = ?, `nieuw_venster` = ?,
                 `wachttijd_klik` = ?, `cooldown_seconden` = ?,
                 `beloning_zak` = ?, `beloning_bank` = ?, `beloning_diamanten` = ?,
                 `actief` = ?, `volgorde` = ?
@@ -129,6 +130,7 @@ function bewerken(array $user, int $id): string
             mb_substr(trim(post('omschrijving')), 0, 255),
             mb_substr($url, 0, 500),
             post('heeft_callback') === '1' ? 1 : 0,
+            post('nieuw_venster') === '1' ? 1 : 0,
             int_input('wachttijd_klik', 20, 0, 3600),
             int_input('cooldown_seconden', 86400, 0, 31_536_000),
             int_input('beloning_zak', 0, 0),
@@ -216,6 +218,11 @@ function toon_form(?array $missie): void
        . ((int) ($missie['heeft_callback'] ?? 0) === 1 ? ' checked' : '') . '> De stemsite roept '
        . 'zelf de callback-url aan om een stem te bevestigen</label></span>';
 
+    echo '<label for="nieuw_venster">Nieuw venster</label>';
+    echo '<span><label><input type="checkbox" id="nieuw_venster" name="nieuw_venster" value="1"'
+       . ((int) ($missie['nieuw_venster'] ?? 1) === 1 ? ' checked' : '') . '> De Stem-link/-knop '
+       . 'opent in een nieuw tabblad in plaats van de huidige pagina weg te sturen</label></span>';
+
     echo '<label for="wachttijd_klik">Wachttijd na klikken (seconden)</label>';
     echo '<input id="wachttijd_klik" name="wachttijd_klik" type="number" min="0" max="3600" value="'
        . (int) ($missie['wachttijd_klik'] ?? 20) . '">';
@@ -277,7 +284,7 @@ function toon_lijst(): void
     }
 
     echo '<div class="tabelwikkel"><table class="lijst">';
-    echo '<thead><tr><th>Naam</th><th>Callback</th><th class="getal">Cooldown</th>'
+    echo '<thead><tr><th>Naam</th><th>Callback</th><th>Venster</th><th class="getal">Cooldown</th>'
        . '<th>Beloning</th><th>Status</th><th></th></tr></thead><tbody>';
 
     foreach ($missies as $missie) {
@@ -292,6 +299,7 @@ function toon_lijst(): void
         echo '<td><a href="' . e(url('adm-klikmissies.php?bewerk=' . $id)) . '">'
            . e((string) $missie['naam']) . '</a></td>';
         echo '<td>' . ((int) $missie['heeft_callback'] === 1 ? 'ja' : 'nee') . '</td>';
+        echo '<td>' . ((int) $missie['nieuw_venster'] === 1 ? 'nieuw' : 'zelfde') . '</td>';
         echo '<td class="getal">' . duration((int) $missie['cooldown_seconden']) . '</td>';
         echo '<td>' . ($beloningen === [] ? '-' : e(implode(', ', $beloningen))) . '</td>';
         echo '<td>' . ((int) $missie['actief'] === 1 ? 'actief' : 'uit') . '</td>';
