@@ -84,7 +84,7 @@ function toevoegen(array $user): string
             int_input('beloning_bank', 0, 0),
             int_input('beloning_diamanten', 0, 0),
             post('actief') === '1' ? 1 : 0,
-            int_input('volgorde', 0),
+            int_input('volgorde', 0, 0),
         ]
     );
 
@@ -132,7 +132,7 @@ function bewerken(array $user, int $id): string
             int_input('beloning_bank', 0, 0),
             int_input('beloning_diamanten', 0, 0),
             post('actief') === '1' ? 1 : 0,
-            int_input('volgorde', 0),
+            int_input('volgorde', 0, 0),
             $id,
         ]
     );
@@ -235,7 +235,7 @@ function toon_form(?array $missie): void
        . (int) ($missie['beloning_diamanten'] ?? 0) . '">';
 
     echo '<label for="volgorde">Volgorde</label>';
-    echo '<input id="volgorde" name="volgorde" type="number" value="'
+    echo '<input id="volgorde" name="volgorde" type="number" min="0" value="'
        . (int) ($missie['volgorde'] ?? 0) . '">';
 
     echo '<label for="actief">Actief</label>';
