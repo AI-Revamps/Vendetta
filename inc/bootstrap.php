@@ -96,13 +96,22 @@ if (!headers_sent()) {
     // advertentienetwerk die anders geweigerd wordt. Die pagina zet zijn eigen
     // header vóórdat bootstrap.php geladen is, en dan slaan we deze over.
     if (!defined('BV_ADVERTENTIEPAGINA')) {
+        // klikmissies.php stuurt de "Stem"-knop naar zichzelf (form-action
+        // 'self' staat dat toe) en verwijst pas daarna, server-side, door
+        // naar de externe stemsite. Chrome en andere moderne browsers passen
+        // form-action ook toe op die tweede stap, dus zonder deze uitzondering
+        // blokkeert de browser de doorverwijzing en blijft de speler op de
+        // eigen pagina hangen. Die pagina zet BV_EXTERNE_DOORVERWIJZING vóórdat
+        // bootstrap.php geladen is, net als advertentie.php hierboven.
+        $formAction = defined('BV_EXTERNE_DOORVERWIJZING') ? "'self' https: http:" : "'self'";
+
         header(
             "Content-Security-Policy: "
             . "default-src 'self'; "
             . "script-src 'self'; "
             . "style-src 'self' 'unsafe-inline'; "
             . "img-src 'self' data: https: http:; "
-            . "form-action 'self'; "
+            . "form-action {$formAction}; "
             . "frame-ancestors 'self'; "
             . "base-uri 'self'; "
             . "object-src 'none'"

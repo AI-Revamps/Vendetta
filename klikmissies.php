@@ -11,6 +11,11 @@
 
 declare(strict_types=1);
 
+// De "Stem"-knop bij niet-callback-missies post naar deze pagina, die daarna
+// pas doorverwijst naar de externe stemsite. Zie de toelichting bij
+// BV_EXTERNE_DOORVERWIJZING in inc/bootstrap.php.
+define('BV_EXTERNE_DOORVERWIJZING', true);
+
 require __DIR__ . '/inc/bootstrap.php';
 require BV_INC . '/klikmissies.php';
 

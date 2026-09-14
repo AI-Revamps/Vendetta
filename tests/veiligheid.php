@@ -295,4 +295,31 @@ check('zonder de header valt terug op REMOTE_ADDR', $ip2 !== '203.0.113.9' && $i
 
 $db->exec("DELETE FROM users WHERE login LIKE 'Cftest%'");
 
+// --- Deel: CSP form-action alleen verruimd waar dat nodig is -----------------
+
+kop('CSP: form-action staat een externe doorverwijzing alleen toe op klikmissies.php');
+
+/** De ruwe CSP-header van een pagina, zonder de doorverwijzing te volgen. */
+function csp_header(string $pad): string
+{
+    $ch = curl_init(BV_BASIS . '/' . ltrim($pad, '/'));
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADER         => true,
+        CURLOPT_FOLLOWLOCATION => false,
+    ]);
+    $body = (string) curl_exec($ch);
+    curl_close($ch);
+
+    return preg_match('/^Content-Security-Policy:\s*(.+)$/mi', $body, $m) ? trim($m[1]) : '';
+}
+
+$klik = csp_header('klikmissies.php');
+$home = csp_header('home.php');
+
+check('klikmissies.php verruimt form-action voor de externe doorverwijzing',
+    str_contains($klik, "form-action 'self' https: http:;"), $klik);
+check('gewone pagina\'s houden de strikte form-action',
+    str_contains($home, "form-action 'self';"), $home);
+
 samenvatting();
