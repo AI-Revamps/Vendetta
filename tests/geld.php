@@ -437,6 +437,65 @@ check('onbekende speler wordt geweigerd', str_starts_with(trim($r4['body']), 'FO
 $db->exec("DELETE FROM klikmissies_log");
 $db->exec("DELETE FROM klikmissies");
 
+kop('klikmissies: zelf-bevestigen beloont pas na de wachttijd, en respecteert de cooldown');
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+// wachttijd_klik staat op 5 seconden, niet 2: haal() volgt redirects (curl
+// CURLOPT_FOLLOWLOCATION), dus de POST met actie=stem laat de testclient zelf
+// deze onbereikbare url achterna gaan. Op sommige machines (o.a. Windows)
+// duurt een "connection refused" op een loopback-poort daardoor zelf al een
+// paar seconden, wat een wachttijd van 2 seconden te dicht op de meetfout
+// van de test zelf zou zetten.
+$db->exec(
+    "INSERT INTO klikmissies
+        (naam, url, heeft_callback, wachttijd_klik, cooldown_seconden, beloning_zak, actief)
+     VALUES ('Testlijst zelf', 'http://127.0.0.1:1/stem?ref={login}', 0, 5, 86400, 5000, 1)"
+);
+$missieId = (int) $db->lastInsertId();
+$db->exec("UPDATE users SET zak=0 WHERE login='Speler'");
+
+login('Speler', 'eenlangwachtwoord');
+
+$h = haal('klikmissies.php');
+haal('klikmissies.php', ['_token' => tok($h['body']), 'actie' => 'stem', 'id' => (string) $missieId]);
+
+$h2 = haal('klikmissies.php');
+$r4 = haal('klikmissies.php',
+    ['_token' => tok($h2['body']), 'actie' => 'bevestig', 'id' => (string) $missieId]);
+
+$u4 = $db->query("SELECT zak FROM users WHERE login='Speler'")->fetch();
+check('te vroeg bevestigen beloont niets', (int) $u4['zak'] === 0, 'zak ' . $u4['zak']);
+check('met een nette foutmelding', str_contains(melding($r4['body']), '[fout]'), melding($r4['body']));
+
+sleep(5);
+
+$h3 = haal('klikmissies.php');
+$r5 = haal('klikmissies.php',
+    ['_token' => tok($h3['body']), 'actie' => 'bevestig', 'id' => (string) $missieId]);
+
+$u5 = $db->query("SELECT zak FROM users WHERE login='Speler'")->fetch();
+check('na de wachttijd wordt wel beloond', (int) $u5['zak'] === 5000, 'zak ' . $u5['zak']);
+check('met een nette bevestiging', str_contains(melding($r5['body']), '[ok]'), melding($r5['body']));
+
+// Nogmaals bevestigen (cooldown loopt nog) mag niets meer opleveren.
+haal('klikmissies.php', ['_token' => tok(haal('klikmissies.php')['body']), 'actie' => 'stem',
+    'id' => (string) $missieId]);
+sleep(5);
+$h6 = haal('klikmissies.php');
+$r6 = haal('klikmissies.php',
+    ['_token' => tok($h6['body']), 'actie' => 'bevestig', 'id' => (string) $missieId]);
+
+$u6 = $db->query("SELECT zak FROM users WHERE login='Speler'")->fetch();
+check('een tweede keer binnen de cooldown beloont niets extra',
+    (int) $u6['zak'] === 5000, 'zak ' . $u6['zak']);
+check('met een foutmelding over de cooldown', str_contains(melding($r6['body']), '[fout]'), melding($r6['body']));
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+
+login('Speler', 'eenlangwachtwoord');
+
 // --- Cron ------------------------------------------------------------------
 
 kop('cron: alle taken draaien');
