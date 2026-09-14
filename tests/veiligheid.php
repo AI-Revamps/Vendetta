@@ -155,6 +155,7 @@ $paginas = [
     'adm-premium.php'  => 'baas',
     'adm-getuigen.php' => 'baas',
     'adm-bo.php'       => 'baas',
+    'adm-klikmissies.php' => 'baas',
 ];
 
 $sessies = ['speler' => $speler, 'mod' => $mod, 'baas' => $baas];

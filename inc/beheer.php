@@ -29,6 +29,7 @@ function beheerpaginas(): array
         'adm-addnews.php'  => ['Nieuws',          LEVEL_ADMIN],
         'adm-poll.php'     => ['Polls',           LEVEL_ADMIN],
         'adm-getuigen.php' => ['Ooggetuigen',     LEVEL_ADMIN],
+        'adm-klikmissies.php' => ['Klikmissies',  LEVEL_ADMIN],
         // Op eigenaarsniveau: hier wordt advertentiecode ingeplakt die
         // ongefilterd bij elke speler in de browser terechtkomt.
         'adm-premium.php'  => ['Premium',         LEVEL_OWNER],

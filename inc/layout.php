@@ -137,6 +137,7 @@ function menu_groups(array $user): array
             'adm-poll.php'     => 'Poll',
             'adm-getuigen.php' => 'Ooggetuigen',
             'adm-premium.php'  => 'Premium',
+            'adm-klikmissies.php' => 'Klikmissies',
         ];
     }
 
