@@ -437,6 +437,34 @@ check('onbekende speler wordt geweigerd', str_starts_with(trim($r4['body']), 'FO
 $db->exec("DELETE FROM klikmissies_log");
 $db->exec("DELETE FROM klikmissies");
 
+kop('klikmissies: een leeg callback_geheim beloont niets, ook niet met een leeg geheim in de aanroep');
+
+$db->exec(
+    "INSERT INTO klikmissies
+        (naam, url, heeft_callback, callback_geheim, cooldown_seconden,
+         beloning_zak, beloning_bank, beloning_diamanten, actief)
+     VALUES ('Testlijst zonder geheim', 'http://127.0.0.1:1/stem?ref={login}', 1, '', 86400,
+             5000, 2000, 3, 1)"
+);
+$missieIdLeeg = (int) $db->lastInsertId();
+
+$db->exec("UPDATE users SET zak=0, bank=0, diamanten=0 WHERE login='Speler'");
+
+$r5 = haal('klikmissies-callback.php?id=' . $missieIdLeeg . '&geheim=&login=Speler');
+$u5 = $db->query("SELECT zak, bank, diamanten FROM users WHERE login='Speler'")->fetch();
+
+check('een leeg callback_geheim wordt geweigerd', str_starts_with(trim($r5['body']), 'FOUT'), $r5['body']);
+check('niets bijgeschreven bij een leeg callback_geheim',
+    (int) $u5['zak'] === 0 && (int) $u5['bank'] === 0 && (int) $u5['diamanten'] === 0, json_encode($u5));
+
+$aantalLogLeeg = (int) $db->query(
+    "SELECT COUNT(*) FROM klikmissies_log WHERE klikmissie_id={$missieIdLeeg}"
+)->fetchColumn();
+check('er staat geen logregel bij een leeg callback_geheim', $aantalLogLeeg === 0, (string) $aantalLogLeeg);
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+
 kop('klikmissies: zelf-bevestigen beloont pas na de wachttijd, en respecteert de cooldown');
 
 $db->exec("DELETE FROM klikmissies_log");

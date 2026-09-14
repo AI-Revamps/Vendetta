@@ -76,6 +76,7 @@ function stem_klik(array $user, int $id): void
 
     $_SESSION['klikmissie_klik'][$id] = time();
 
+    header('Referrer-Policy: origin');
     redirect(klikmissie_url($missie, $user['login']));
 }
 
@@ -130,7 +131,7 @@ function toon_missies(array $user): void
             echo '<p>Nog beschikbaar over <strong data-tot="' . $wacht . '">'
                . e(duration($wacht - time())) . '</strong>.</p>';
         } elseif ((int) $missie['heeft_callback'] === 1) {
-            echo '<p><a class="knop" target="_blank" rel="noopener" href="'
+            echo '<p><a class="knop" target="_blank" rel="noopener" referrerpolicy="origin" href="'
                . e(klikmissie_url($missie, $user['login'])) . '">Stem</a> '
                . '<span class="uitleg">De beloning komt automatisch na het stemmen.</span></p>';
         } else {

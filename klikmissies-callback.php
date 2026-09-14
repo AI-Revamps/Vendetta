@@ -25,6 +25,11 @@ if ($missie === null) {
     exit;
 }
 
+if ((int) $missie['heeft_callback'] !== 1 || (string) $missie['callback_geheim'] === '') {
+    echo 'FOUT: onbekende missie';
+    exit;
+}
+
 if (!hash_equals((string) $missie['callback_geheim'], $geheim)) {
     echo 'FOUT: ongeldig token';
     exit;

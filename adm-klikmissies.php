@@ -107,6 +107,9 @@ function bewerken(array $user, int $id): string
     if ($naam === '') {
         throw new SpelFout('Vul een naam in.');
     }
+    if (mb_strlen($naam) > 100) {
+        throw new SpelFout('De naam mag hoogstens 100 tekens lang zijn.');
+    }
 
     $url = trim(post('url'));
 
