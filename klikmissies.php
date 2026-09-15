@@ -169,7 +169,7 @@ function toon_klikflow(array $missie, int $id): void
         // vernieuwen. Zonder JavaScript verschijnt dit blok pas na een
         // handmatige vernieuwing van de pagina, via de tak hieronder.
         echo '<div id="' . e($wachtId) . '" hidden>';
-        echo '<p>Wacht nog <strong>0:00</strong> en klik dan op bevestigen.</p>';
+        echo '<p>Wacht nog <strong data-tot="0">0:00</strong> en klik dan op bevestigen.</p>';
         echo '<form method="post">' . csrf_field();
         echo '<input type="hidden" name="actie" value="bevestig">';
         echo '<input type="hidden" name="id" value="' . $id . '">';
