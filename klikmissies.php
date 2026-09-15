@@ -154,14 +154,28 @@ function toon_klikflow(array $missie, int $id): void
 
     if ($geklikt === null) {
         $venster = (int) $missie['nieuw_venster'] === 1 ? ' target="_blank"' : '';
-        echo '<form method="post"' . $venster . '>' . csrf_field();
+        $wachtId = 'klikmissie-wacht-' . $id;
+
+        echo '<form method="post"' . $venster . ' class="klikmissie-stem" data-wachttijd="'
+           . (int) $missie['wachttijd_klik'] . '" data-doel="' . e($wachtId) . '">' . csrf_field();
         echo '<input type="hidden" name="actie" value="stem">';
         echo '<input type="hidden" name="id" value="' . $id . '">';
         echo '<button type="submit" class="knop">Stem</button>';
         echo '</form>';
-        if ($venster !== '') {
-            echo '<p class="uitleg">Opent in een nieuw tabblad. Kom hierheen terug om te bevestigen.</p>';
-        }
+        echo '<noscript><p class="uitleg">Vernieuw deze pagina na het stemmen om te bevestigen.</p></noscript>';
+
+        // Verborgen tot de JavaScript hierboven hem na het klikken op "Stem"
+        // meteen zichtbaar maakt, zodat de speler niet zelf hoeft te
+        // vernieuwen. Zonder JavaScript verschijnt dit blok pas na een
+        // handmatige vernieuwing van de pagina, via de tak hieronder.
+        echo '<div id="' . e($wachtId) . '" hidden>';
+        echo '<p>Wacht nog <strong>0:00</strong> en klik dan op bevestigen.</p>';
+        echo '<form method="post">' . csrf_field();
+        echo '<input type="hidden" name="actie" value="bevestig">';
+        echo '<input type="hidden" name="id" value="' . $id . '">';
+        echo '<button type="submit" class="knop" disabled>Ik heb gestemd</button>';
+        echo '</form>';
+        echo '</div>';
         return;
     }
 

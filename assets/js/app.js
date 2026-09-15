@@ -122,12 +122,9 @@
     // --- Aftellers -------------------------------------------------------
     //
     // Elk element met data-tot="<unix-tijd>" telt af naar nul en laadt de
-    // pagina daarna één keer opnieuw, zodat de knop weer werkt.
-
-    var tellers = document.querySelectorAll('[data-tot]');
-    if (tellers.length === 0) {
-        return;
-    }
+    // pagina daarna één keer opnieuw, zodat de knop weer werkt. Zoekt bij
+    // elke tik opnieuw in de pagina, zodat een element dat pas ná het laden
+    // een data-tot krijgt (zie de klikmissies hieronder) ook meetelt.
 
     function opmaak(seconden) {
         if (seconden <= 0) { return '0:00'; }
@@ -138,11 +135,13 @@
         return (u > 0 ? u + ':' : '') + mm + ':' + (s < 10 ? '0' : '') + s;
     }
 
-    var herlaadGepland = false;
+    var herlaadGepland  = false;
+    var aftellerLoopt   = false;
 
     function tik() {
-        var nu = Math.floor(Date.now() / 1000);
-        var actief = 0;
+        var tellers = document.querySelectorAll('[data-tot]');
+        var nu      = Math.floor(Date.now() / 1000);
+        var actief  = 0;
 
         tellers.forEach(function (el) {
             var over = parseInt(el.getAttribute('data-tot'), 10) - nu;
@@ -160,8 +159,45 @@
 
         if (actief > 0) {
             setTimeout(tik, 1000);
+        } else {
+            aftellerLoopt = false;
         }
     }
 
-    tik();
+    function begintellen() {
+        if (!aftellerLoopt) {
+            aftellerLoopt = true;
+            tik();
+        }
+    }
+
+    if (document.querySelectorAll('[data-tot]').length > 0) {
+        begintellen();
+    }
+
+    // --- Klikmissies: wachtknop meteen tonen na "Stem" --------------------
+    //
+    // De "Stem"-knop stuurt de speler naar de externe stemsite (in een
+    // nieuw tabblad of de huidige tab) en doet daarnaast een gewone POST
+    // naar deze pagina; het serverantwoord bepaalt straks écht of de
+    // wachttijd voorbij is. Hier tonen we, zonder op dat antwoord te
+    // wachten, alvast wat de speler na een vernieuwing toch te zien zou
+    // krijgen: de afteller en de (voorlopig uitgeschakelde) bevestigknop.
+
+    document.querySelectorAll('.klikmissie-stem').forEach(function (form) {
+        form.addEventListener('submit', function () {
+            var wacht = parseInt(form.getAttribute('data-wachttijd'), 10) || 0;
+            var blok  = document.getElementById(form.getAttribute('data-doel'));
+            if (!blok) { return; }
+
+            var teller = blok.querySelector('[data-tot]');
+            if (teller) {
+                teller.setAttribute('data-tot', String(Math.floor(Date.now() / 1000) + wacht));
+            }
+
+            form.hidden = true;
+            blok.hidden = false;
+            begintellen();
+        });
+    });
 }());

@@ -239,6 +239,18 @@ check('zelf-bevestigen + nieuw venster: formulier heeft target="_blank"',
 check('zelf-bevestigen + zelfde venster: formulier heeft geen target="_blank"',
     $zelfZelfde !== '' && !str_contains($zelfZelfde, 'target="_blank"'), $zelfZelfde);
 
+kop('klikmissies: Stem-knop heeft de haakjes om de bevestigknop direct te tonen');
+
+check('Stem-formulier draagt de wachttijd en verwijst naar het wachtblok',
+    str_contains($zelfNieuw, 'class="klikmissie-stem"')
+    && str_contains($zelfNieuw, 'data-wachttijd="20"')
+    && str_contains($zelfNieuw, 'data-doel="klikmissie-wacht-'), $zelfNieuw);
+check('het wachtblok staat verborgen, met een uitgeschakelde bevestigknop',
+    str_contains($zelfNieuw, 'id="klikmissie-wacht-')
+    && str_contains($zelfNieuw, ' hidden>')
+    && str_contains($zelfNieuw, '<button type="submit" class="knop" disabled>Ik heb gestemd</button>'),
+    $zelfNieuw);
+
 $db->exec("DELETE FROM klikmissies_log");
 $db->exec("DELETE FROM klikmissies");
 
