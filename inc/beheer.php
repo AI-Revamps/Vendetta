@@ -117,8 +117,8 @@ function beheer_logregels(string $area, int $aantal = 25): void
     foreach ($regels as $regel) {
         echo '<tr>';
         echo '<td>' . e(datetime_nl($regel['time'])) . '</td>';
-        echo '<td>' . e((string) $regel['login']) . '</td>';
-        echo '<td>' . e((string) $regel['person']) . '</td>';
+        echo '<td>' . speler_naam((string) $regel['login']) . '</td>';
+        echo '<td>' . speler_naam((string) $regel['person']) . '</td>';
         echo '<td>' . e((string) $regel['com']) . '</td>';
         echo '</tr>';
     }

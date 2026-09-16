@@ -52,7 +52,7 @@ if ($melding !== null) {
 // Zit deze beheerder in een ander account?
 if (isset($_SESSION['beheer_terug'])) {
     panel_open('Je kijkt mee als een andere speler');
-    echo '<p>Je bent ingelogd als <strong>' . e((string) $user['login'])
+    echo '<p>Je bent ingelogd als <strong>' . speler_naam((string) $user['login'])
        . '</strong>. Alles wat je doet gebeurt op dat account.</p>';
     echo '<form method="post">' . csrf_field()
        . '<input type="hidden" name="actie" value="terug">'
@@ -279,7 +279,7 @@ function toon_speler(array $user, string $naam): void
             );
 
             $namen = array_map(
-                static fn (array $r): string => '<a href="'
+                static fn (array $r): string => '<a' . speler_rol_attr((string) $r['login']) . ' href="'
                     . e(url('adm-search.php?login=' . rawurlencode((string) $r['login']))) . '">'
                     . e((string) $r['login']) . '</a>',
                 $andere

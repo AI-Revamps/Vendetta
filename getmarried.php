@@ -292,7 +292,7 @@ function scheiden(array $user): string
 function toon_getrouwd(array $user): void
 {
     panel_open('Je huwelijk');
-    echo '<p>Je bent getrouwd met <strong><a href="'
+    echo '<p>Je bent getrouwd met <strong><a' . speler_rol_attr((string) $user['huwelijk']) . ' href="'
        . e(url('user.php?x=' . rawurlencode((string) $user['huwelijk']))) . '">'
        . e((string) $user['huwelijk']) . '</a></strong>.</p>';
 
@@ -320,14 +320,14 @@ function toon_aanzoek(array $user, array $aanzoek): void
     panel_open('Huwelijksaanzoek');
 
     if ($isAanvrager) {
-        echo '<p>Je hebt <strong>' . e((string) $ander) . '</strong> ten huwelijk gevraagd in '
+        echo '<p>Je hebt <strong>' . speler_naam((string) $ander) . '</strong> ten huwelijk gevraagd in '
            . e((string) $aanzoek['stad']) . '.</p>';
         echo '<p>' . ($jawoord
-            ? '<strong>' . e((string) $ander) . ' heeft ja gezegd.</strong> Zorg dat jullie allebei in '
+            ? '<strong>' . speler_naam((string) $ander) . ' heeft ja gezegd.</strong> Zorg dat jullie allebei in '
               . e((string) $aanzoek['stad']) . ' zijn en voltrek het huwelijk.'
             : 'Wachten op antwoord.') . '</p>';
     } else {
-        echo '<p><strong>' . e((string) $ander) . '</strong> vraagt je ten huwelijk in '
+        echo '<p><strong>' . speler_naam((string) $ander) . '</strong> vraagt je ten huwelijk in '
            . e((string) $aanzoek['stad']) . '.</p>';
     }
 

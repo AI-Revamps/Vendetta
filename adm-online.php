@@ -44,7 +44,8 @@ if ($spelers === []) {
         $staf   = (int) $speler['level'] >= LEVEL_MODERATOR;
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('adm-search.php?login=' . rawurlencode((string) $speler['login'])))
+        echo '<td><a' . speler_rol_attr((string) $speler['login']) . ' href="'
+           . e(url('adm-search.php?login=' . rawurlencode((string) $speler['login'])))
            . '">' . e((string) $speler['login']) . '</a>'
            . ($staf ? ' <small>(staf)</small>' : '')
            . ($speler['status'] !== 'levend' ? ' <small>(dood)</small>' : '') . '</td>';

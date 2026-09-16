@@ -65,10 +65,10 @@ if ($bans === []) {
     echo '<thead><tr><th>Naam</th><th>IP-adres</th><th>Reden</th><th>Door</th><th></th></tr></thead><tbody>';
     foreach ($bans as $ban) {
         echo '<tr>';
-        echo '<td>' . ($ban['login'] !== '' ? e((string) $ban['login']) : '-') . '</td>';
+        echo '<td>' . ($ban['login'] !== '' ? speler_naam((string) $ban['login']) : '-') . '</td>';
         echo '<td>' . ($ban['ip'] !== '' ? e((string) $ban['ip']) : '-') . '</td>';
         echo '<td>' . e((string) $ban['reden']) . '</td>';
-        echo '<td>' . e((string) $ban['door']) . '</td>';
+        echo '<td>' . speler_naam((string) $ban['door']) . '</td>';
         echo '<td><form method="post" style="margin:0">' . csrf_field()
            . '<input type="hidden" name="actie" value="opheffen">'
            . '<input type="hidden" name="id" value="' . (int) $ban['id'] . '">'

@@ -148,7 +148,7 @@ if ($open !== []) {
     foreach ($open as $rij) {
         echo '<tr><td><code>' . e((string) $rij['code']) . '</code></td>'
            . '<td>' . ((string) $rij['door'] === ''
-                ? '<em>iedereen</em>' : e((string) $rij['door'])) . '</td></tr>';
+                ? '<em>iedereen</em>' : speler_naam((string) $rij['door'])) . '</td></tr>';
     }
     echo '</tbody></table></div>';
     echo '<p class="uitleg">Deze codes zijn nog niet ingewisseld. Zodra iemand hem '

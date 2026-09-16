@@ -333,7 +333,8 @@ function toon_beschietingen(array $user): void
         foreach ($regels as $r) {
             echo '<tr>'
                . '<td>' . e(datetime_nl($r['time'])) . '</td>'
-               . '<td><a href="' . e(url('user.php?x=' . rawurlencode((string) $r['login']))) . '">'
+               . '<td><a' . speler_rol_attr((string) $r['login']) . ' href="'
+               . e(url('user.php?x=' . rawurlencode((string) $r['login']))) . '">'
                . e((string) $r['login']) . '</a></td>'
                . '<td>' . e(uitkomst_tekst((int) $r['code'])) . '</td>'
                . '</tr>';

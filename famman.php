@@ -502,7 +502,7 @@ function toon_leden(array $user, array $familie): void
         $hoger = (int) $lid['famrang'] >= (int) $user['famrang'];
 
         echo '<tr>';
-        echo '<td>' . e((string) $lid['login']) . '</td>';
+        echo '<td>' . speler_naam((string) $lid['login']) . '</td>';
         echo '<td>' . e(fam_rangnaam((int) $lid['famrang'])) . '</td>';
         echo '<td class="getal">' . num((int) $lid['xp']) . '</td>';
         echo '<td>';
@@ -555,7 +555,7 @@ function toon_uitnodigen(array $user, array $familie): void
     if ($open !== []) {
         echo '<h3>Openstaande uitnodigingen</h3><ul>';
         foreach ($open as $rij) {
-            echo '<li>' . e((string) $rij['login']) . '</li>';
+            echo '<li>' . speler_naam((string) $rij['login']) . '</li>';
         }
         echo '</ul>';
     }
@@ -630,7 +630,7 @@ function toon_logboek(array $user, array $familie): void
             $bedrag = (int) $regel['code'];
             echo '<tr>';
             echo '<td>' . e(datetime_nl($regel['time'])) . '</td>';
-            echo '<td>' . e((string) $regel['person']) . '</td>';
+            echo '<td>' . speler_naam((string) $regel['person']) . '</td>';
             echo '<td class="getal">' . ($bedrag < 0 ? '&minus;' : '+') . ' ' . money(abs($bedrag)) . '</td>';
             echo '<td>' . e((string) $regel['com']) . '</td>';
             echo '</tr>';

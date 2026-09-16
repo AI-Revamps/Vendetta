@@ -232,6 +232,13 @@ echo '<p>Gebruik <a href="' . e(url('login.php?x=lostpass')) . '">wachtwoord ver
    . 'de inlogpagina. Je krijgt een link per e-mail waarmee je een nieuw wachtwoord instelt. '
    . 'Je wachtwoord veranderen doe je op je <a href="' . e(url('profile.php')) . '">profiel</a>.</p>';
 
+echo '<h3>Kleur van namen</h3>';
+echo '<p>Overal waar een gebruikersnaam getoond wordt zie je aan de kleur meteen wie het is: '
+   . '<strong style="color:var(--rol-staf)">bordeauxrood</strong> voor Owner en Admin, '
+   . '<strong style="color:var(--rol-moderator)">oranje</strong> voor Moderator, '
+   . '<strong style="color:var(--rol-premium)">goud</strong> voor wie premium heeft, en een '
+   . '<strong class="naam-gebanned">doorgestreepte naam</strong> voor een gebanned account.</p>';
+
 panel_close();
 
 // --- Premium ---------------------------------------------------------------

@@ -151,7 +151,7 @@ function toon_topics(string $categorie, int $pagina): void
             echo '<td><a href="' . e(url('adm-forum.php?topic=' . (int) $rij['id'])) . '">'
                . e((string) $rij['subject']) . '</a></td>';
             echo '<td>' . e(forum_categorieen()[$rij['type']] ?? (string) $rij['type']) . '</td>';
-            echo '<td>' . e((string) $rij['user']) . '</td>';
+            echo '<td>' . speler_naam((string) $rij['user']) . '</td>';
             echo '<td>' . e(datetime_nl($rij['date'])) . '</td>';
             echo '<td class="getal">' . num((int) $rij['reacties']) . '</td>';
             echo '<td>' . verwijderknop('topic', (int) $rij['id']) . '</td>';
@@ -179,7 +179,7 @@ function toon_topic(int $id): void
     panel_open('Topic ' . $id . ': ' . $topic['subject']);
     echo '<p><a href="' . e(url('adm-forum.php?type=' . rawurlencode((string) $topic['type'])))
        . '">&larr; Terug naar de lijst</a></p>';
-    echo '<p><strong>' . e((string) $topic['user']) . '</strong> &middot; '
+    echo '<p><strong>' . speler_naam((string) $topic['user']) . '</strong> &middot; '
        . e(datetime_nl($topic['date'])) . '</p>';
     echo '<div class="forumbericht">' . bericht_html((string) $topic['message']) . '</div>';
     echo verwijderknop('topic', $id, 'Topic en alle reacties verwijderen');
@@ -197,7 +197,7 @@ function toon_topic(int $id): void
     } else {
         foreach ($reacties as $reactie) {
             echo '<div class="forumreactie">';
-            echo '<p><strong>' . e((string) $reactie['user']) . '</strong> &middot; '
+            echo '<p><strong>' . speler_naam((string) $reactie['user']) . '</strong> &middot; '
                . e(datetime_nl($reactie['date'])) . ' '
                . verwijderknop('reactie', (int) $reactie['id']) . '</p>';
             echo '<div class="forumbericht">' . bericht_html((string) $reactie['message']) . '</div>';

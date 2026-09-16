@@ -181,7 +181,8 @@ function overzicht(string $titel, string $waar, string $toon, string $kop, strin
         $aantal = (int) $regel['code'];
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('user.php?x=' . rawurlencode((string) $regel[$toon]))) . '">'
+        echo '<td><a' . speler_rol_attr((string) $regel[$toon]) . ' href="'
+           . e(url('user.php?x=' . rawurlencode((string) $regel[$toon]))) . '">'
            . e((string) $regel[$toon]) . '</a></td>';
         echo '<td class="getal ' . ($aantal < 0 ? 'schande' : 'eer') . '">'
            . ($aantal > 0 ? '+' : '') . num($aantal) . '</td>';

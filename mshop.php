@@ -347,7 +347,7 @@ function kogels_lijst(): void
         foreach ($aanbod as $r) {
             $perStuk = (int) $r['aantal'] > 0 ? (int) round((int) $r['prijs'] / (int) $r['aantal']) : 0;
             echo '<tr>'
-               . '<td>' . e((string) $r['login']) . '</td>'
+               . '<td>' . speler_naam((string) $r['login']) . '</td>'
                . '<td class="getal">' . num((int) $r['aantal']) . '</td>'
                . '<td class="getal">' . money((int) $r['prijs']) . '</td>'
                . '<td class="getal">' . money($perStuk) . '</td>'
@@ -459,7 +459,8 @@ function ws_lijst(): void
         echo '<thead><tr><th>Moord op</th><th class="getal">Prijs</th><th>Loopt af</th><th></th></tr></thead><tbody>';
         foreach ($aanbod as $r) {
             echo '<tr>'
-               . '<td><a href="' . e(url('user.php?x=' . rawurlencode((string) $r['victim']))) . '">'
+               . '<td><a' . speler_rol_attr((string) $r['victim']) . ' href="'
+               . e(url('user.php?x=' . rawurlencode((string) $r['victim']))) . '">'
                . e((string) $r['victim']) . '</a></td>'
                . '<td class="getal">' . money((int) $r['prijs']) . '</td>'
                . '<td>' . e(datetime_nl($r['time'])) . '</td>'

@@ -220,7 +220,7 @@ function toon_lijst(array $user, string $soort): void
         echo '<tr>';
         echo '<td><input type="checkbox" name="id[]" value="' . (int) $bericht['id']
            . '" aria-label="Selecteer bericht"></td>';
-        echo '<td>' . e((string) $tegenpartij) . '</td>';
+        echo '<td>' . speler_naam((string) $tegenpartij) . '</td>';
         echo '<td><a href="' . e(url('message.php?p=read&id=' . (int) $bericht['id'])) . '">'
            . ($nieuw ? '<strong>' : '') . e((string) $bericht['subject']) . ($nieuw ? '</strong>' : '')
            . '</a>' . ((int) $bericht['save'] === 1 ? ' <small>(bewaard)</small>' : '') . '</td>';
@@ -257,8 +257,8 @@ function toon_bericht(array $user, int $id): void
 
     panel_open($bericht['subject'] === '' ? '(geen onderwerp)' : (string) $bericht['subject']);
 
-    echo '<p class="uitleg">Van <strong>' . e((string) $bericht['from']) . '</strong> aan <strong>'
-       . e((string) $bericht['to']) . '</strong> op ' . e(datetime_nl($bericht['time'])) . '</p>';
+    echo '<p class="uitleg">Van <strong>' . speler_naam((string) $bericht['from']) . '</strong> aan <strong>'
+       . speler_naam((string) $bericht['to']) . '</strong> op ' . e(datetime_nl($bericht['time'])) . '</p>';
 
     // Alleen systeemberichten mogen spelknoppen tonen, nooit tekst van spelers.
     $vanSysteem = $bericht['from'] === 'Notificatie';

@@ -223,7 +223,7 @@ function toon_winkel(array $user, array $fabriek, array $eigenaar, int $wacht): 
     $voorraad = (int) $fabriek['winst'];
     $prijs    = (int) $fabriek['inzet'];
 
-    echo '<p>Eigenaar: <strong>' . e((string) $eigenaar['login']) . '</strong>. '
+    echo '<p>Eigenaar: <strong>' . speler_naam((string) $eigenaar['login']) . '</strong>. '
        . 'Voorraad: ' . num($voorraad) . ' kogels à ' . money($prijs) . '.</p>';
 
     if ($wacht > 0) {

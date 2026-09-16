@@ -52,7 +52,7 @@ if ($cel !== null) {
 // --- Gegevens ---
 panel_open('Je gangster');
 echo '<div class="tabelwikkel"><table class="lijst">';
-gegevensrij('Naam', e((string) $user['login']) . ' <small>(#' . (int) $user['id'] . ')</small>');
+gegevensrij('Naam', speler_naam((string) $user['login']) . ' <small>(#' . (int) $user['id'] . ')</small>');
 gegevensrij('Rang', e(rank_name((int) $user['xp'], (string) $user['geslacht']))
     . ' <small>(' . rank_progress((int) $user['xp']) . '% naar de volgende)</small>');
 gegevensrij('Ervaring', num((int) $user['xp']));

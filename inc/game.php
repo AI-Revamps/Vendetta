@@ -88,6 +88,104 @@ function rank_index(int $xp): int
     return $index;
 }
 
+// --- Rolkleur van gebruikersnamen -------------------------------------------
+
+/**
+ * Niveau en premiumstatus van elke speler, één keer per verzoek geladen.
+ * Zo kost het inkleuren van een lijst met tientallen namen (forum,
+ * ledenlijst, topspelers) geen aparte query per naam.
+ *
+ * @return array<string,array{level:int,premium:bool}>
+ */
+function speler_rollen(): array
+{
+    static $rollen = null;
+
+    if ($rollen === null) {
+        $rollen = [];
+        foreach (q_all('SELECT `login`, `level`, `premium_tot` FROM `users`') as $rij) {
+            $rollen[(string) $rij['login']] = [
+                'level'   => (int) $rij['level'],
+                'premium' => $rij['premium_tot'] !== null
+                    && strtotime((string) $rij['premium_tot']) > time(),
+            ];
+        }
+    }
+
+    return $rollen;
+}
+
+/** Alle gebande logins, één keer per verzoek geladen. */
+function gebande_logins(): array
+{
+    static $logins = null;
+
+    if ($logins === null) {
+        $logins = array_column(
+            q_all("SELECT DISTINCT `login` FROM `bans` WHERE `login` <> ''"),
+            'login'
+        );
+    }
+
+    return $logins;
+}
+
+/**
+ * CSS-klasse voor de kleur van een gebruikersnaam, op basis van rol,
+ * premium en ban. Een gewone speler zonder rol, premium of ban krijgt ''.
+ * Een ban overschrijft rol en premium; een rol overschrijft premium.
+ */
+function speler_rol_klasse(string $login): string
+{
+    if (in_array($login, gebande_logins(), true)) {
+        return 'naam-gebanned';
+    }
+
+    $rol = speler_rollen()[$login] ?? null;
+
+    if ($rol === null) {
+        return '';
+    }
+    if ($rol['level'] >= LEVEL_ADMIN) {
+        return 'naam-staf';
+    }
+    if ($rol['level'] >= LEVEL_MODERATOR) {
+        return 'naam-moderator';
+    }
+    if ($rol['premium']) {
+        return 'naam-premium';
+    }
+
+    return '';
+}
+
+/**
+ * Kant-en-klaar `class="..."`-attribuut voor een link of ander element om een
+ * gebruikersnaam heen, of '' als er niets bijzonders is. Scheelt een losse
+ * lege `class=""` op elke plek die dit gebruikt.
+ */
+function speler_rol_attr(string $login): string
+{
+    $klasse = speler_rol_klasse($login);
+
+    return $klasse === '' ? '' : ' class="' . e($klasse) . '"';
+}
+
+/**
+ * Een gebruikersnaam, veilig ge-escaped en in de kleur van zijn rol.
+ * Voor plekken die geen link om de naam heen bouwen; bouwt de pagina wel
+ * een link, gebruik dan `speler_rol_attr()` op die `<a>` in plaats van
+ * deze functie.
+ */
+function speler_naam(string $login): string
+{
+    $klasse = speler_rol_klasse($login);
+
+    return $klasse === ''
+        ? e($login)
+        : '<span class="' . e($klasse) . '">' . e($login) . '</span>';
+}
+
 // --- Wachttijden ----------------------------------------------------------
 
 /**

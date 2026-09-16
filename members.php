@@ -122,7 +122,8 @@ if ($spelers === []) {
         $online = (int) $speler['online'] > time() - 300;
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('user.php?x=' . rawurlencode((string) $speler['login'])))
+        echo '<td><a' . speler_rol_attr((string) $speler['login']) . ' href="'
+           . e(url('user.php?x=' . rawurlencode((string) $speler['login'])))
            . '">' . e((string) $speler['login']) . '</a></td>';
         echo '<td>' . e(rank_name((int) $speler['xp'])) . '</td>';
         echo '<td>' . ($speler['status'] === 'levend'

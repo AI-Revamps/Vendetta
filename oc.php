@@ -658,7 +658,8 @@ function toon_oc(array $user, array $oc): void
 
     echo '<div class="tabelwikkel"><table class="lijst">';
     echo '<thead><tr><th>Rol</th><th>Speler</th><th>Status</th></tr></thead><tbody>';
-    echo '<tr><th scope="row">Leider</th><td>' . e((string) $oc['login']) . '</td><td>Plannen gemaakt</td></tr>';
+    echo '<tr><th scope="row">Leider</th><td>' . speler_naam((string) $oc['login'])
+       . '</td><td>Plannen gemaakt</td></tr>';
     regelrij('Wapenexpert', (string) $oc['we'], (int) $oc['ready1'],
         oc_wapens()[(int) $oc['wapens']]['naam'] ?? '' , num((int) $oc['kogels']) . ' kogels');
     regelrij('Bommenexpert', (string) $oc['be'], (int) $oc['ready2'],
@@ -729,7 +730,7 @@ function regelrij(string $rol, string $speler, int $gereed, string $wat, string 
         : ($gereed === 1 ? 'Klaar — ' . e($wat) . ' (' . e($extra) . ')' : 'Wacht nog');
 
     echo '<tr><th scope="row">' . e($rol) . '</th>'
-       . '<td>' . ($speler === '' ? '-' : e($speler)) . '</td>'
+       . '<td>' . ($speler === '' ? '-' : speler_naam($speler)) . '</td>'
        . '<td>' . $status . '</td></tr>';
 }
 

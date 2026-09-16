@@ -426,7 +426,8 @@ function toon_route(array $user, array $route): void
     $klaar    = (int) $route['ready2'] === 1;
 
     echo '<p>Route 66 in <strong>' . e((string) $route['stad']) . '</strong>. '
-       . 'Leider: ' . e((string) $route['login']) . '. Driver: ' . e((string) $route['driver']) . '.</p>';
+       . 'Leider: ' . speler_naam((string) $route['login'])
+       . '. Driver: ' . speler_naam((string) $route['driver']) . '.</p>';
     echo '<p>Status: ' . ($klaar ? 'de wagen staat klaar.' : 'wachten op de wagen van de driver.') . '</p>';
 
     if (!$isLeider && !$klaar) {

@@ -64,7 +64,7 @@ if ((string) $doel['pic'] !== '') {
 
 echo '<div class="tabelwikkel"><table class="lijst"><tbody>';
 
-veld('Naam', e((string) $doel['login'])
+veld('Naam', speler_naam((string) $doel['login'])
     . ((int) $doel['level'] >= LEVEL_MODERATOR ? ' <span class="staf">staf</span>' : ''));
 veld('Geslacht', e((string) $doel['geslacht']));
 veld('Status', $doel['status'] === 'levend'
@@ -84,7 +84,7 @@ veld((int) $doel['famrang'] === 5 ? 'Don van' : 'Familie',
 
 veld('Huwelijk', (string) $doel['huwelijk'] === ''
     ? '—'
-    : e((string) $doel['login']) . ' &amp; ' . e((string) $doel['huwelijk']));
+    : speler_naam((string) $doel['login']) . ' &amp; ' . speler_naam((string) $doel['huwelijk']));
 
 veld('Route 66', beschikbaar((int) $doel['pc_ts'], (int) $doel['xp'], 150));
 veld('Organised Crime', beschikbaar((int) $doel['bc_ts'], (int) $doel['xp'], 500));
@@ -128,7 +128,8 @@ if ($vrienden === []) {
     echo '<p>';
     foreach ($vrienden as $i => $vriend) {
         echo ($i > 0 ? ' &middot; ' : '')
-           . '<a href="' . e(url('user.php?x=' . rawurlencode((string) $vriend['friend']))) . '">'
+           . '<a' . speler_rol_attr((string) $vriend['friend']) . ' href="'
+           . e(url('user.php?x=' . rawurlencode((string) $vriend['friend']))) . '">'
            . e((string) $vriend['friend']) . '</a>';
     }
     echo '</p>';

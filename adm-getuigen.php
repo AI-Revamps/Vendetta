@@ -149,9 +149,9 @@ if ($verklaringen === []) {
 
     foreach ($verklaringen as $v) {
         echo '<tr>';
-        echo '<td>' . e((string) $v['login']) . '</td>';
-        echo '<td>' . e((string) $v['victim']) . '</td>';
-        echo '<td>' . e((string) $v['suspect']) . '</td>';
+        echo '<td>' . speler_naam((string) $v['login']) . '</td>';
+        echo '<td>' . speler_naam((string) $v['victim']) . '</td>';
+        echo '<td>' . speler_naam((string) $v['suspect']) . '</td>';
         echo '<td>' . ((int) $v['status'] === 1 ? 'te koop' : 'in bezit') . '</td>';
         echo '<td class="getal">' . ((int) $v['status'] === 1 ? money((int) $v['prijs']) : '—') . '</td>';
         echo '<td>' . e(datetime_nl($v['time'])) . '</td>';

@@ -77,7 +77,8 @@ if ($lijst === []) {
         $afkoop = (int) $rij['prijs'] * 2;
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('user.php?x=' . rawurlencode((string) $rij['login']))) . '">'
+        echo '<td><a' . speler_rol_attr((string) $rij['login']) . ' href="'
+           . e(url('user.php?x=' . rawurlencode((string) $rij['login']))) . '">'
            . e((string) $rij['login']) . '</a></td>';
         echo '<td>' . e((string) $rij['stad']) . '</td>';
         echo '<td class="getal">' . money((int) $rij['prijs']) . '</td>';

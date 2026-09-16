@@ -70,7 +70,7 @@ if ($melding !== null) {
 panel_open('Rust in vrede');
 
 echo '<p><img src="' . e(url('images/rip.gif')) . '" alt="" style="float:right;margin-left:1rem">';
-echo '<strong>' . e((string) $user['login']) . '</strong> is niet meer. Je bent omgelegd.</p>';
+echo '<strong>' . speler_naam((string) $user['login']) . '</strong> is niet meer. Je bent omgelegd.</p>';
 
 if ($moord !== null) {
     echo '<p>Vermoord op ' . e(datetime_nl($moord['date'])) . '.</p>';

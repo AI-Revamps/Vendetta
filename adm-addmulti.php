@@ -71,7 +71,7 @@ if ($lijst === []) {
             [$rij['ip']]);
 
         $links = array_map(
-            static fn (array $r): string => '<a href="'
+            static fn (array $r): string => '<a' . speler_rol_attr((string) $r['login']) . ' href="'
                 . e(url('adm-search.php?login=' . rawurlencode((string) $r['login']))) . '">'
                 . e((string) $r['login']) . '</a>',
             $namen
