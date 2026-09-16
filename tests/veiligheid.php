@@ -385,4 +385,42 @@ check('klikmissies.php verruimt form-action voor de externe doorverwijzing',
 check('gewone pagina\'s houden de strikte form-action',
     str_contains($home, "form-action 'self';"), $home);
 
+// --- Deel: rolkleur van gebruikersnamen -------------------------------------
+
+kop('rolkleur: elke naam krijgt de klasse die bij zijn rol, premium of ban hoort');
+
+/** De inhoud van de "Naam"-rij op een profielpagina. */
+function naamcel(string $html): string
+{
+    return preg_match('#<tr><th>Naam</th><td>(.*?)</td></tr>#s', $html, $m) ? $m[1] : '';
+}
+
+$profiel = static fn (string $naam): string => haal('user.php?x=' . $naam, null, $baas)['body'];
+
+check('moderator krijgt naam-moderator',
+    str_contains(naamcel($profiel('Mod')), '<span class="naam-moderator">Mod</span>'));
+check('admin krijgt naam-staf',
+    str_contains(naamcel($profiel('Admin')), '<span class="naam-staf">Admin</span>'));
+check('eigenaar krijgt naam-staf',
+    str_contains(naamcel($profiel('Baas')), '<span class="naam-staf">Baas</span>'));
+
+$gewoon = naamcel($profiel('Speler'));
+check('gewone speler krijgt geen klasse', $gewoon === 'Speler', $gewoon);
+
+$db->exec("UPDATE users SET premium_tot = DATE_ADD(NOW(), INTERVAL 1 DAY) WHERE login = 'Speler'");
+check('speler met premium krijgt naam-premium',
+    str_contains(naamcel($profiel('Speler')), '<span class="naam-premium">Speler</span>'));
+
+// Rol gaat vóór premium: een admin met premium blijft bordeaux, niet goud.
+$db->exec("UPDATE users SET premium_tot = DATE_ADD(NOW(), INTERVAL 1 DAY) WHERE login = 'Admin'");
+check('admin met premium toont toch naam-staf, niet naam-premium',
+    str_contains(naamcel($profiel('Admin')), '<span class="naam-staf">Admin</span>'));
+$db->exec("UPDATE users SET premium_tot = NULL WHERE login IN ('Speler', 'Admin')");
+
+// Een ban overschrijft alles, ook een staffrol.
+$db->exec("INSERT INTO bans (login, reden, door) VALUES ('Mod', 'test', 'Baas')");
+check('een gebande moderator toont naam-gebanned, niet naam-moderator',
+    str_contains(naamcel($profiel('Mod')), '<span class="naam-gebanned">Mod</span>'));
+$db->exec("DELETE FROM bans WHERE login = 'Mod'");
+
 samenvatting();

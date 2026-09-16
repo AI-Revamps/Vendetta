@@ -25,6 +25,11 @@
     --fout:       #e0596b;
     --waarschuw:  #e8a33d;
 
+    /* Rolkleuren voor gebruikersnamen. */
+    --rol-staf:      #a83246;   /* owner en admin */
+    --rol-moderator: var(--waarschuw);
+    --rol-premium:   #d4af37;
+
     --radius:     6px;
     --radius-s:   4px;
 
@@ -706,6 +711,13 @@ img.smilie {
     letter-spacing: .05em;
     vertical-align: middle;
 }
+
+/* Kleur van een gebruikersnaam naar rol, premium of ban. Een ban overschrijft
+   de rol- of premiumkleur; zie speler_rol_klasse() in inc/game.php. */
+.naam-staf      { color: var(--rol-staf); }
+.naam-moderator { color: var(--rol-moderator); }
+.naam-premium   { color: var(--rol-premium); }
+.naam-gebanned  { color: var(--tekst-dof); text-decoration: line-through; }
 
 blockquote {
     margin: .8rem 0;
