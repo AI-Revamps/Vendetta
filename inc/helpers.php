@@ -245,25 +245,39 @@ function fail_page(string $title, string $body, int $status = 503): void
         http_response_code($status);
         header('Content-Type: text/html; charset=utf-8');
     }
-    $t = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+
+    $t         = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+    $siteNaam  = htmlspecialchars((string) config('site.name', 'Black Vendetta'), ENT_QUOTES, 'UTF-8');
+    $logoPad   = BV_ROOT . '/assets/img/logo-mark.png';
+    $logo      = is_file($logoPad)
+        ? '<img src="' . htmlspecialchars(url('assets/img/logo-mark.png'), ENT_QUOTES, 'UTF-8')
+          . '" alt="" width="40" height="40">'
+        : '';
+
     echo <<<HTML
     <!doctype html>
     <html lang="nl">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>{$t}</title>
+      <title>{$t} - {$siteNaam}</title>
       <style>
         body { background:#070b12; color:#dde5f0; font:14px/1.6 system-ui, sans-serif;
                display:grid; place-items:center; min-height:100vh; margin:0; padding:1rem; }
         .box { max-width:34rem; border:1px solid #22304a; background:#0f1724;
                padding:1.5rem 2rem; border-radius:10px; }
+        .merk { display:flex; align-items:center; gap:.6rem; margin-bottom:1.1rem; }
+        .merk img { border-radius:8px; }
+        .merk span { font-weight:600; letter-spacing:.02em; color:#8fa0b8; }
         h1 { color:#3ba2f0; font-size:1.2rem; margin:0 0 .75rem; }
         a { color:#3ba2f0; }
         a:hover { color:#6ec8ff; }
       </style>
     </head>
-    <body><div class="box"><h1>{$t}</h1><div>{$body}</div></div></body>
+    <body><div class="box">
+      <div class="merk">{$logo}<span>{$siteNaam}</span></div>
+      <h1>{$t}</h1><div>{$body}</div>
+    </div></body>
     </html>
     HTML;
     exit;

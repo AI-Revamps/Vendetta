@@ -176,8 +176,9 @@ function db_fail(PDOException $e, string $sql = ''): void
     }
 
     fail_page(
-        'Database niet bereikbaar',
-        'Er ging iets mis bij het benaderen van de database. Probeer het over ' .
-        'een minuut opnieuw. Blijft dit gebeuren, laat het dan weten aan de beheerder.'
+        'We zijn zo terug',
+        'We zijn het spel eventjes aan het bijwerken. Meestal duurt dat maar een paar ' .
+        'minuten — vernieuw deze pagina zo nog eens. Blijft dit lang duren, laat het dan ' .
+        'weten aan de beheerder.'
     );
 }
