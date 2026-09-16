@@ -153,14 +153,14 @@ $paginas = [
     'adm-online.php'   => 'mod',
     'adm-warn.php'     => 'mod',
     'adm-search.php'   => 'mod',
-    'adm-msg.php'      => 'baas',
-    'adm-ban.php'      => 'baas',
-    'adm-addmulti.php' => 'baas',
+    'adm-msg.php'      => 'admin',
+    'adm-ban.php'      => 'admin',
+    'adm-addmulti.php' => 'admin',
     'adm-items.php'    => 'baas',
     'adm-premium.php'  => 'admin',
-    'adm-getuigen.php' => 'baas',
+    'adm-getuigen.php' => 'admin',
     'adm-bo.php'       => 'baas',
-    'adm-klikmissies.php' => 'baas',
+    'adm-klikmissies.php' => 'admin',
 ];
 
 foreach ($paginas as $pagina => $vanaf) {
