@@ -97,6 +97,17 @@ check('menu bevat Loterij',
 check('menu bevat Rijschool',
     (bool) preg_match('#<a href="[^"]*rijbewijs[^"]*"[^>]*>Rijschool</a>#', $menu));
 
+$onlineNu = (int) tdb()->query(
+    "SELECT COUNT(*) FROM users WHERE status = 'levend'
+       AND online > DATE_SUB(NOW(), INTERVAL 15 MINUTE)"
+)->fetchColumn();
+check('menu toont het echte aantal online spelers achter Spelers',
+    (bool) preg_match(
+        '#members\.php\?filter=levend">Spelers \(' . $onlineNu . ' online\)</a>#',
+        $menu
+    ),
+    $menu);
+
 // --- Gevangenistimer ---------------------------------------------------------
 
 kop('gevangenistimer');
