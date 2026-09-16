@@ -64,9 +64,9 @@ if ($lijst === []) {
     foreach ($lijst as $rij) {
         echo '<tr>';
         echo '<td>' . e(datetime_nl($rij['time'])) . '</td>';
-        echo '<td>' . e((string) $rij['cheater']) . '</td>';
+        echo '<td>' . speler_naam((string) $rij['cheater']) . '</td>';
         echo '<td>' . e((string) $rij['com']) . '</td>';
-        echo '<td>' . e((string) $rij['person']) . '</td>';
+        echo '<td>' . speler_naam((string) $rij['person']) . '</td>';
         echo '<td><form method="post" style="margin:0">' . csrf_field()
            . '<input type="hidden" name="actie" value="verwijderen">'
            . '<input type="hidden" name="id" value="' . (int) $rij['id'] . '">'

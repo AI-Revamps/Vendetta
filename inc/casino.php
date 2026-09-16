@@ -259,7 +259,7 @@ function casino_kop(array $user, array $casino): bool
         return false;
     }
 
-    echo '<p>Eigenaar: <strong>' . e((string) $eigenaar['login']) . '</strong>. '
+    echo '<p>Eigenaar: <strong>' . speler_naam((string) $eigenaar['login']) . '</strong>. '
        . 'Maximale inzet: <strong>' . money((int) $casino['inzet']) . '</strong>.</p>';
 
     if ($eigenaar['login'] === $user['login']) {
@@ -279,7 +279,7 @@ function casino_kop(array $user, array $casino): bool
     }
 
     if ((int) $eigenaar['bank'] < CASINO_MIN_KAS) {
-        echo '<p>De kas van ' . e((string) $eigenaar['login']) . ' is te laag. '
+        echo '<p>De kas van ' . speler_naam((string) $eigenaar['login']) . ' is te laag. '
            . 'Er kan nu niet gespeeld worden.</p>';
         panel_close();
         return false;

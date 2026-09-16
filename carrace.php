@@ -384,7 +384,7 @@ function toon_race(array $user, array $race): void
     $klaar      = (int) $race['ready2'] === 1;
 
     echo '<p>Race in <strong>' . e((string) $race['stad']) . '</strong> tussen '
-       . e((string) $race['login']) . ' en ' . e((string) $race['enemy']) . '.</p>';
+       . speler_naam((string) $race['login']) . ' en ' . speler_naam((string) $race['enemy']) . '.</p>';
 
     $auto1 = q_row('SELECT * FROM `garage` WHERE `id` = ?', [$race['id1']]);
     $auto2 = q_row('SELECT * FROM `garage` WHERE `id` = ?', [$race['id2']]);
@@ -409,7 +409,7 @@ function toon_race(array $user, array $race): void
                . '<input type="hidden" name="actie" value="go">'
                . '<button type="submit" class="knop-nadruk" style="display:inline-block">Start de race</button></form> ';
         } else {
-            echo '<p>Wachten tot ' . e((string) $race['enemy']) . ' een wagen kiest.</p>';
+            echo '<p>Wachten tot ' . speler_naam((string) $race['enemy']) . ' een wagen kiest.</p>';
         }
     }
 
@@ -420,7 +420,7 @@ function toon_race(array $user, array $race): void
 
 function wagenrij(string $speler, ?array $auto): void
 {
-    echo '<tr><td>' . e($speler) . '</td>';
+    echo '<tr><td>' . speler_naam($speler) . '</td>';
 
     if ($auto === null) {
         echo '<td colspan="3"><em>nog geen wagen gekozen</em></td></tr>';

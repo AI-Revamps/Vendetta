@@ -72,8 +72,8 @@ if ($recent === []) {
         echo '<tr>';
         echo '<td>' . e(datetime_nl($regel['time'])) . '</td>';
         echo '<td>' . e((string) $regel['area']) . '</td>';
-        echo '<td>' . e((string) $regel['login']) . '</td>';
-        echo '<td>' . e((string) $regel['person']) . '</td>';
+        echo '<td>' . speler_naam((string) $regel['login']) . '</td>';
+        echo '<td>' . speler_naam((string) $regel['person']) . '</td>';
         echo '<td class="getal">' . ((int) $regel['code'] !== 0 ? num((int) $regel['code']) : '') . '</td>';
         echo '<td>' . e((string) $regel['com']) . '</td>';
         echo '</tr>';

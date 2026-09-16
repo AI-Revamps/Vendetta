@@ -99,7 +99,7 @@ if ($lopend === []) {
     foreach ($lopend as $opdracht) {
         $over = max(0, (int) $opdracht['terug_ts'] - time());
         echo '<tr>';
-        echo '<td>' . e((string) $opdracht['naar']) . '</td>';
+        echo '<td>' . speler_naam((string) $opdracht['naar']) . '</td>';
         echo '<td>' . e((string) $opdracht['stad']) . '</td>';
         echo '<td>' . ($over > 0
             ? '<span data-tot="' . (int) $opdracht['terug_ts'] . '">' . e(duration($over)) . '</span>'

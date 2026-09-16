@@ -69,7 +69,8 @@ if ($cellen === []) {
         $over = max(0, (int) $cel['tot_ts'] - time());
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('adm-search.php?login=' . rawurlencode((string) $cel['login'])))
+        echo '<td><a' . speler_rol_attr((string) $cel['login']) . ' href="'
+           . e(url('adm-search.php?login=' . rawurlencode((string) $cel['login'])))
            . '">' . e((string) $cel['login']) . '</a></td>';
         echo '<td>' . e((string) $cel['stad']) . '</td>';
         echo '<td class="getal">' . money((int) $cel['boete']) . '</td>';

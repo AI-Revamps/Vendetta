@@ -80,7 +80,7 @@ if ($lijst === []) {
         $isZelf = $naam === (string) $user['login'];
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('user.php?x=' . rawurlencode($naam))) . '">'
+        echo '<td><a' . speler_rol_attr($naam) . ' href="' . e(url('user.php?x=' . rawurlencode($naam))) . '">'
            . e($naam) . '</a></td>';
         echo '<td>' . e(datetime_nl($rij['time'])) . '</td>';
         echo '<td>' . e((string) $rij['com']) . '</td>';

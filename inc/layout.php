@@ -561,7 +561,7 @@ function status_panel(array $user): void
     $cel  = jail_status($user['login']);
 
     echo '<aside class="statuspaneel">' . "\n";
-    echo '<h2>' . e($user['login']) . "</h2>\n";
+    echo '<h2>' . speler_naam((string) $user['login']) . "</h2>\n";
     echo '<p class="rang">' . e($rang) . "</p>\n";
 
     echo '<div class="balk" role="img" aria-label="Vordering naar volgende rang: ' . $vord . ' procent">'

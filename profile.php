@@ -167,7 +167,7 @@ if ($vrienden === []) {
         $naam = (string) $vriend['friend'];
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('user.php?x=' . rawurlencode($naam))) . '">'
+        echo '<td><a' . speler_rol_attr($naam) . ' href="' . e(url('user.php?x=' . rawurlencode($naam))) . '">'
            . e($naam) . '</a></td>';
         echo '<td><form method="post" style="margin:0">' . csrf_field()
            . '<input type="hidden" name="actie" value="vriend_weg">'

@@ -249,7 +249,8 @@ function toon_familie(array $user, string $naam): void
     foreach ($leden as $lid) {
         $dood = $lid['status'] !== 'levend';
         echo '<tr>';
-        echo '<td><a href="' . e(url('user.php?x=' . rawurlencode((string) $lid['login']))) . '">'
+        echo '<td><a' . speler_rol_attr((string) $lid['login']) . ' href="'
+           . e(url('user.php?x=' . rawurlencode((string) $lid['login']))) . '">'
            . e((string) $lid['login']) . '</a>' . ($dood ? ' <small>(dood)</small>' : '') . '</td>';
         echo '<td>' . e(fam_rangnaam((int) $lid['famrang'])) . '</td>';
         echo '<td class="getal">' . num((int) $lid['xp']) . '</td>';
