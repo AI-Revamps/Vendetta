@@ -22,6 +22,17 @@ declare(strict_types=1);
 require __DIR__ . '/inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
+/** De rechtenniveaus met hun naam, van laag naar hoog. */
+function rechtenniveaus(): array
+{
+    return [
+        'Speler'    => LEVEL_SPELER,
+        'Moderator' => LEVEL_MODERATOR,
+        'Admin'     => LEVEL_ADMIN,
+        'Eigenaar'  => LEVEL_OWNER,
+    ];
+}
+
 /**
  * De velden die bewerkt mogen worden, met hun soort.
  * Alles wat hier niet in staat is niet aan te passen.
@@ -31,7 +42,7 @@ function bewerkbare_velden(): array
     return [
         'email'     => ['label' => 'E-mailadres',     'soort' => 'email'],
         'ip'        => ['label' => 'IP-adres',        'soort' => 'tekst', 'max' => 45],
-        'level'     => ['label' => 'Rechtenniveau',   'soort' => 'getal', 'min' => 1, 'max' => 1000],
+        'level'     => ['label' => 'Rechtenniveau',   'soort' => 'niveau'],
         'stad'      => ['label' => 'Stad',            'soort' => 'stad'],
         'geslacht'  => ['label' => 'Geslacht',        'soort' => 'geslacht'],
         'activated' => ['label' => 'Geactiveerd',     'soort' => 'getal', 'min' => 0, 'max' => 1],
@@ -144,10 +155,10 @@ function opslaan(array $user, int $id): string
             continue;
         }
 
-        // Je mag niemand op je eigen niveau of hoger zetten.
-        if ($veld === 'level' && (int) $nieuw >= (int) $user['level']) {
-            throw new SpelFout('Je kunt niemand een rechtenniveau geven dat gelijk is aan of '
-                . 'hoger dan dat van jezelf.');
+        // Je mag niemand een hoger rechtenniveau geven dan jezelf hebt. Gelijk mag
+        // wel, zodat de eigenaar een tweede eigenaar kan aanwijzen.
+        if ($veld === 'level' && (int) $nieuw > (int) $user['level']) {
+            throw new SpelFout('Je kunt niemand een hoger rechtenniveau geven dan dat van jezelf.');
         }
 
         $zetten[]      = "`{$veld}` = ?";
@@ -182,7 +193,7 @@ function opslaan(array $user, int $id): string
  */
 function onveranderd(string $soort, string $oud, string|int|float $nieuw): bool
 {
-    if ($soort === 'getal' || $soort === 'komma') {
+    if ($soort === 'getal' || $soort === 'komma' || $soort === 'niveau') {
         return abs((float) $oud - (float) $nieuw) < 0.001;
     }
 
@@ -244,6 +255,12 @@ function waarde_controleren(string $veld, array $def, string $ruw): string|int|f
             }
             return $ruw;
 
+        case 'niveau':
+            if (!in_array((int) $ruw, rechtenniveaus(), true)) {
+                throw new SpelFout('Kies een bestaand rechtenniveau.');
+            }
+            return (int) $ruw;
+
         default:
             return mb_substr($ruw, 0, $def['max'] ?? 255);
     }
@@ -282,6 +299,13 @@ function toon_formulier(array $user, array $doel): void
             foreach ($opties as $optie) {
                 echo '<option value="' . e($optie) . '"' . ($optie === $waarde ? ' selected' : '')
                    . '>' . e($optie) . '</option>';
+            }
+            echo '</select>';
+        } elseif ($def['soort'] === 'niveau') {
+            echo '<select id="v_' . e($veld) . '" name="' . e($veld) . '">';
+            foreach (rechtenniveaus() as $naam => $niveau) {
+                echo '<option value="' . $niveau . '"' . ((string) $niveau === $waarde ? ' selected' : '')
+                   . '>' . e($naam) . ' (' . $niveau . ')</option>';
             }
             echo '</select>';
         } elseif ($def['soort'] === 'stad') {

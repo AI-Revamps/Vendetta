@@ -140,7 +140,12 @@ kop('rechten: elk beheerniveau ziet precies wat het mag');
 
 $speler = login('Speler', 'spelerwachtwoord123');
 $mod    = login('Mod',    'modwachtwoord123456');
+$admin  = login('Admin',  'adminwachtwoord12345');
 $baas   = login('Baas',   'baaswachtwoord12345');
+
+/** naam => rechtenniveau, in dezelfde volgorde als $sessies hieronder */
+$niveaus = ['speler' => 1, 'mod' => 200, 'admin' => 255, 'baas' => 1000];
+$sessies = ['speler' => $speler, 'mod' => $mod, 'admin' => $admin, 'baas' => $baas];
 
 /** pagina => het laagste niveau dat erbij mag */
 $paginas = [
@@ -152,13 +157,11 @@ $paginas = [
     'adm-ban.php'      => 'baas',
     'adm-addmulti.php' => 'baas',
     'adm-items.php'    => 'baas',
-    'adm-premium.php'  => 'baas',
+    'adm-premium.php'  => 'admin',
     'adm-getuigen.php' => 'baas',
     'adm-bo.php'       => 'baas',
     'adm-klikmissies.php' => 'baas',
 ];
-
-$sessies = ['speler' => $speler, 'mod' => $mod, 'baas' => $baas];
 
 foreach ($paginas as $pagina => $vanaf) {
     $mag = [];
@@ -168,14 +171,74 @@ foreach ($paginas as $pagina => $vanaf) {
         }
     }
 
-    $verwacht = match ($vanaf) {
-        'mod'   => ['mod', 'baas'],
-        default => ['baas'],
-    };
+    $verwacht = array_keys(array_filter(
+        $niveaus,
+        static fn (int $n): bool => $n >= $niveaus[$vanaf]
+    ));
 
     check($pagina . ': vanaf ' . $vanaf, $mag === $verwacht,
         $mag === [] ? 'niemand' : implode(', ', $mag));
 }
+
+// Op adm-premium.php mag een admin de veilige acties, maar niet de
+// advertentiecode of de balansinstellingen — die blijven voor de eigenaar,
+// want dat veld gaat ongefilterd naar de browser van elke speler.
+kop('adm-premium.php: admin mag geen advertentiecode of balans aanpassen');
+
+$db->exec("DELETE FROM instellingen WHERE naam IN ('ads_html', 'premium_prijs')");
+
+$tokenAdmin = tok(haal('adm-premium.php', null, $admin)['body']);
+haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'advertentie',
+    'html' => '<script>alert(1)</script>', 'interval' => '10'], $admin);
+
+$adsHtml = $db->query(
+    "SELECT waarde FROM instellingen WHERE naam = 'ads_html'"
+)->fetchColumn();
+
+check('admin kan de advertentiecode niet zetten', $adsHtml === false,
+    'ads_html: ' . var_export($adsHtml, true));
+
+haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'balans',
+    'kans' => '1', 'prijs' => '1', 'kofi' => 'https://voorbeeld.nl'], $admin);
+
+$premiumPrijs = $db->query(
+    "SELECT waarde FROM instellingen WHERE naam = 'premium_prijs'"
+)->fetchColumn();
+
+check('admin kan de premiumprijs niet zetten', $premiumPrijs === false,
+    'premium_prijs: ' . var_export($premiumPrijs, true));
+
+kop('adm-premium.php: admin mag wel rechtstreeks premiumdagen toekennen');
+
+$db->exec("UPDATE users SET premium_tot = NULL WHERE login = 'Speler'");
+
+haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'dagen',
+    'speler2' => 'Speler', 'dagen' => '7'], $admin);
+
+$premiumTot    = (string) $db->query(
+    "SELECT premium_tot FROM users WHERE login = 'Speler'"
+)->fetchColumn();
+$verschilDagen = $premiumTot !== ''
+    ? (int) round((strtotime($premiumTot) - time()) / 86400)
+    : null;
+
+check('premium van Speler staat nu precies 7 dagen in de toekomst',
+    $verschilDagen === 7, 'verschil: ' . var_export($verschilDagen, true));
+
+$db->exec("UPDATE users SET premium_tot = NULL WHERE login = 'Speler'");
+
+kop('adm-bo.php: de eigenaar mag iemand tot eigenaar maken, niet hoger');
+
+$db->exec("UPDATE users SET level = 1 WHERE login = 'Speler'");
+
+$id      = (int) $db->query("SELECT id FROM users WHERE login = 'Speler'")->fetchColumn();
+$tokenBo = tok(haal('adm-bo.php', null, $baas)['body']);
+haal('adm-bo.php', ['_token' => $tokenBo, 'id' => (string) $id, 'level' => '1000'], $baas);
+
+$nieuwLevel = (int) $db->query("SELECT level FROM users WHERE login = 'Speler'")->fetchColumn();
+check('Speler is nu eigenaar (niveau 1000)', $nieuwLevel === 1000, 'niveau ' . $nieuwLevel);
+
+$db->exec("UPDATE users SET level = 1 WHERE login = 'Speler'");
 
 // Rechten moeten ook bij een POST gelden, niet alleen bij het tonen.
 kop('rechten gelden ook bij POST');

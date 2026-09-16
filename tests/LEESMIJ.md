@@ -37,6 +37,7 @@ zie je databasefouten niet.
 |---|---|---|
 | `Speler` | 1 (gewone speler) | `spelerwachtwoord123` |
 | `Mod` | 200 (moderator) | `modwachtwoord123456` |
+| `Admin` | 255 (admin) | `adminwachtwoord12345` |
 | `Baas` | 1000 (eigenaar) | `baaswachtwoord12345` |
 
 Allemaal in Brussel, met een huis, 100.000 op zak en 50.000 op de bank.

@@ -1,11 +1,12 @@
 <?php
 /**
- * Zet drie testaccounts klaar in de testdatabase, plus de steden.
+ * Zet vier testaccounts klaar in de testdatabase, plus de steden.
  *
  *     php tests/seed.php
  *
  * Speler  (niveau 1)     spelerwachtwoord123
  * Mod     (niveau 200)   modwachtwoord123456
+ * Admin   (niveau 255)   adminwachtwoord12345
  * Baas    (niveau 1000)  baaswachtwoord12345
  */
 
@@ -14,9 +15,10 @@ declare(strict_types=1);
 require __DIR__ . '/_start.php';
 
 $accounts = [
-    ['Speler', 'spelerwachtwoord123', 1],
-    ['Mod',    'modwachtwoord123456', 200],
-    ['Baas',   'baaswachtwoord12345', 1000],
+    ['Speler', 'spelerwachtwoord123',  1],
+    ['Mod',    'modwachtwoord123456',  200],
+    ['Admin',  'adminwachtwoord12345', 255],
+    ['Baas',   'baaswachtwoord12345',  1000],
 ];
 
 $db = tdb();

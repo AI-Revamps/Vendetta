@@ -30,9 +30,11 @@ function beheerpaginas(): array
         'adm-poll.php'     => ['Polls',           LEVEL_ADMIN],
         'adm-getuigen.php' => ['Ooggetuigen',     LEVEL_ADMIN],
         'adm-klikmissies.php' => ['Klikmissies',  LEVEL_ADMIN],
-        // Op eigenaarsniveau: hier wordt advertentiecode ingeplakt die
-        // ongefilterd bij elke speler in de browser terechtkomt.
-        'adm-premium.php'  => ['Premium',         LEVEL_OWNER],
+        // De pagina zelf mag een admin in; de advertentiecode en de
+        // balansinstellingen erop blijven daarbinnen apart op eigenaarsniveau
+        // afgeschermd, want dat veld gaat ongefilterd bij elke speler in de
+        // browser terecht.
+        'adm-premium.php'  => ['Premium',         LEVEL_ADMIN],
         'adm-items.php'    => ['Items',           LEVEL_OWNER],
         'adm-drdrpr.php'   => ['Steden',          LEVEL_OWNER],
         'adm-bo.php'       => ['Speler bewerken', LEVEL_OWNER],
