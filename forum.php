@@ -244,7 +244,7 @@ function toon_overzicht(): void
            . (is_alleen_lezen($sleutel) ? ' <small>(alleen lezen)</small>' : '') . '</td>';
         echo '<td class="getal">' . num($tellingen[$sleutel] ?? 0) . '</td>';
         echo '<td>' . ($laatste === null ? '-'
-             : e((string) $laatste['user']) . ' &middot; ' . e(datetime_nl($laatste['date']))) . '</td>';
+             : speler_naam((string) $laatste['user']) . ' &middot; ' . e(datetime_nl($laatste['date']))) . '</td>';
         echo '</tr>';
     }
 
@@ -279,7 +279,7 @@ function toon_categorie(array $user, string $categorie, int $pagina): void
             echo '<tr>';
             echo '<td><a href="' . e(url('forum.php?topic=' . (int) $topic['id'])) . '">'
                . e((string) $topic['subject']) . '</a></td>';
-            echo '<td>' . e((string) $topic['user']) . '</td>';
+            echo '<td>' . speler_naam((string) $topic['user']) . '</td>';
             echo '<td class="getal">' . num((int) $topic['reacties']) . '</td>';
             echo '<td>' . e(datetime_nl($topic['date'])) . '</td>';
             echo '</tr>';
@@ -361,7 +361,7 @@ function toon_topic(array $user, int $id, int $pagina): void
 function bericht_blok(array $user, array $bericht, string $soort): void
 {
     echo '<div class="forumbericht">';
-    echo '<div class="forumkop"><strong><a href="'
+    echo '<div class="forumkop"><strong><a' . speler_rol_attr((string) $bericht['user']) . ' href="'
        . e(url('user.php?x=' . rawurlencode((string) $bericht['user']))) . '">'
        . e((string) $bericht['user']) . '</a></strong> '
        . '<span class="uitleg">' . e(datetime_nl($bericht['date'])) . '</span></div>';

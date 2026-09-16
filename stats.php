@@ -196,7 +196,8 @@ function regel(string $label, string $waarde): void
 
 function spelerlink(string $naam): string
 {
-    return '<a href="' . e(url('user.php?x=' . rawurlencode($naam))) . '">' . e($naam) . '</a>';
+    return '<a' . speler_rol_attr($naam) . ' href="' . e(url('user.php?x=' . rawurlencode($naam)))
+         . '">' . e($naam) . '</a>';
 }
 
 function ranglijst(string $titel, string $richting): void
