@@ -522,6 +522,49 @@ check('met een foutmelding over de cooldown', str_contains(melding($r6['body']),
 $db->exec("DELETE FROM klikmissies_log");
 $db->exec("DELETE FROM klikmissies");
 
+kop('klikmissies: een sessie-klik op een verwijderde missie telt niet mee voor een '
+  . 'nieuwe missie die toevallig hetzelfde id krijgt');
+
+$db->exec("ALTER TABLE klikmissies AUTO_INCREMENT = 1");
+$db->exec(
+    "INSERT INTO klikmissies
+        (naam, url, heeft_callback, wachttijd_klik, cooldown_seconden, beloning_zak, actief)
+     VALUES ('Oude missie', 'http://127.0.0.1:1/stem?ref={login}', 0, 2, 86400, 5000, 1)"
+);
+$oudId = (int) $db->lastInsertId();
+$db->exec("UPDATE users SET zak=0 WHERE login='Speler'");
+
+login('Speler', 'eenlangwachtwoord');
+
+$h7 = haal('klikmissies.php');
+haal('klikmissies.php', ['_token' => tok($h7['body']), 'actie' => 'stem', 'id' => (string) $oudId]);
+
+// De admin verwijdert deze missie en maakt een heel andere aan; door het
+// hergebruikte AUTO_INCREMENT krijgt die toevallig hetzelfde id.
+$db->exec("DELETE FROM klikmissies WHERE id={$oudId}");
+$db->exec("ALTER TABLE klikmissies AUTO_INCREMENT = {$oudId}");
+$db->exec(
+    "INSERT INTO klikmissies
+        (naam, url, heeft_callback, wachttijd_klik, cooldown_seconden, beloning_zak, actief)
+     VALUES ('Nieuwe missie', 'http://127.0.0.1:1/stem?ref={login}', 0, 2, 86400, 7000, 1)"
+);
+$nieuwId = (int) $db->lastInsertId();
+check('de vervangende missie heeft inderdaad hetzelfde id', $nieuwId === $oudId, 'nieuw id ' . $nieuwId);
+
+sleep(2);
+
+$h8 = haal('klikmissies.php');
+$r7 = haal('klikmissies.php',
+    ['_token' => tok($h8['body']), 'actie' => 'bevestig', 'id' => (string) $nieuwId]);
+
+$u7 = $db->query("SELECT zak FROM users WHERE login='Speler'")->fetch();
+check('bevestigen zonder op de nieuwe missie gestemd te hebben beloont niets',
+    (int) $u7['zak'] === 0, 'zak ' . $u7['zak']);
+check('met een nette foutmelding', str_contains(melding($r7['body']), '[fout]'), melding($r7['body']));
+
+$db->exec("DELETE FROM klikmissies_log");
+$db->exec("DELETE FROM klikmissies");
+
 login('Speler', 'eenlangwachtwoord');
 
 // --- Cron ------------------------------------------------------------------

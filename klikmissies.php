@@ -79,7 +79,7 @@ function stem_klik(array $user, int $id): void
         throw new SpelFout('Je moet nog even wachten voor je hier weer aan mag meedoen.');
     }
 
-    $_SESSION['klikmissie_klik'][$id] = time();
+    $_SESSION['klikmissie_klik'][$id] = ['tijd' => time(), 'aangemaakt_op' => (string) $missie['aangemaakt_op']];
 
     header('Referrer-Policy: origin');
     redirect(klikmissie_url($missie, $user['login']));
@@ -94,12 +94,12 @@ function stem_bevestigen(array $user, int $id): string
         throw new SpelFout('Die klikmissie bestaat niet meer.');
     }
 
-    $geklikt = $_SESSION['klikmissie_klik'][$id] ?? null;
+    $geklikt = klikmissie_geklikt_op($missie, $id);
 
     if ($geklikt === null) {
         throw new SpelFout('Klik eerst op "Stem" voordat je dit kunt bevestigen.');
     }
-    if (time() - (int) $geklikt < (int) $missie['wachttijd_klik']) {
+    if (time() - $geklikt < (int) $missie['wachttijd_klik']) {
         throw new SpelFout('Dat ging te snel. Wacht nog even.');
     }
 
@@ -107,6 +107,29 @@ function stem_bevestigen(array $user, int $id): string
     unset($_SESSION['klikmissie_klik'][$id]);
 
     return 'Bedankt voor het stemmen! De beloning is bijgeschreven.';
+}
+
+/**
+ * Unix-tijdstip van de sessie-klik op "Stem" voor deze missie, of null als
+ * die er niet (meer geldig) is.
+ *
+ * De klik hoort bij de missie-rij zelf, niet alleen bij het id: is de missie
+ * intussen verwijderd en is er een nieuwe met hetzelfde id aangemaakt (het
+ * id is een AUTO_INCREMENT en kan dus hergebruikt raken), dan is de oude
+ * klik niet meer geldig voor die nieuwe missie. Zonder deze check zou een
+ * speler die ooit op "Stem" klikte en nooit bevestigde, later — zodra zijn
+ * missie is vervangen door een andere met hetzelfde id — die andere missie
+ * kunnen bevestigen zonder er ooit op gestemd te hebben.
+ */
+function klikmissie_geklikt_op(array $missie, int $id): ?int
+{
+    $klik = $_SESSION['klikmissie_klik'][$id] ?? null;
+
+    if (!is_array($klik) || $klik['aangemaakt_op'] !== (string) $missie['aangemaakt_op']) {
+        return null;
+    }
+
+    return (int) $klik['tijd'];
 }
 
 // ==========================================================================
@@ -150,7 +173,7 @@ function toon_missies(array $user): void
 
 function toon_klikflow(array $missie, int $id): void
 {
-    $geklikt = $_SESSION['klikmissie_klik'][$id] ?? null;
+    $geklikt = klikmissie_geklikt_op($missie, $id);
 
     if ($geklikt === null) {
         $venster = (int) $missie['nieuw_venster'] === 1 ? ' target="_blank"' : '';
