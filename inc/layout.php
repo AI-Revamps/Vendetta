@@ -105,6 +105,9 @@ function menu_groups(array $user): array
         $groepen['Status']['klikmissies.php'] .= ' (' . num(min(99, $beschikbaar)) . ')';
     }
 
+    $online = status_summary($user)['online'] ?? 0;
+    $groepen['Status']['members.php?filter=levend'] .= ' (' . num($online) . ' online)';
+
     // Familie-items hangen af van lidmaatschap en rang binnen de familie.
     $fam  = (string) ($user['famillie'] ?? '');
     $rang = (int) ($user['famrang'] ?? 0);
