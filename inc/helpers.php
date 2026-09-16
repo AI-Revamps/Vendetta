@@ -237,9 +237,13 @@ function flash_take(): array
  * Toon een losstaande foutpagina en stop. Wordt gebruikt als de normale
  * layout niet beschikbaar is (geen database, ban, ontbrekende config).
  *
+ * $detail is voor de ontwikkelaar: de echte foutmelding, ingeklapt in een
+ * detailsvenstertje. Geef dit alleen mee in debug-modus — een bezoeker
+ * hoort geen databasedetails te zien.
+ *
  * @return never
  */
-function fail_page(string $title, string $body, int $status = 503): void
+function fail_page(string $title, string $body, int $status = 503, ?string $detail = null): void
 {
     if (!headers_sent()) {
         http_response_code($status);
@@ -253,6 +257,9 @@ function fail_page(string $title, string $body, int $status = 503): void
         ? '<img src="' . htmlspecialchars(url('assets/img/logo-mark.png'), ENT_QUOTES, 'UTF-8')
           . '" alt="" width="40" height="40">'
         : '';
+
+    $details = $detail === null ? '' : '<details class="detail"><summary>Technische details</summary>'
+        . '<pre>' . htmlspecialchars($detail, ENT_QUOTES, 'UTF-8') . '</pre></details>';
 
     echo <<<HTML
     <!doctype html>
@@ -272,11 +279,18 @@ function fail_page(string $title, string $body, int $status = 503): void
         h1 { color:#3ba2f0; font-size:1.2rem; margin:0 0 .75rem; }
         a { color:#3ba2f0; }
         a:hover { color:#6ec8ff; }
+        .detail { margin-top:1.1rem; border-top:1px solid #22304a; padding-top:.75rem; }
+        .detail summary { cursor:pointer; color:#8fa0b8; font-size:.8rem; user-select:none; }
+        .detail summary:hover { color:#dde5f0; }
+        .detail pre { margin:.6rem 0 0; padding:.6rem .75rem; background:#070b12;
+                      border:1px solid #22304a; border-radius:6px; color:#e0596b;
+                      font-size:.78rem; white-space:pre-wrap; word-break:break-word; }
       </style>
     </head>
     <body><div class="box">
       <div class="merk">{$logo}<span>{$siteNaam}</span></div>
       <h1>{$t}</h1><div>{$body}</div>
+      {$details}
     </div></body>
     </html>
     HTML;

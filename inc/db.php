@@ -159,7 +159,8 @@ function db_table_exists(string $table): bool
 
 /**
  * Databasefout afhandelen: naar het log, en een nette pagina voor de bezoeker.
- * In debug-modus wordt de echte fout getoond.
+ * In debug-modus staat de echte fout er ook bij, ingeklapt achter "Technische
+ * details".
  *
  * @return never
  */
@@ -168,17 +169,12 @@ function db_fail(PDOException $e, string $sql = ''): void
     $detail = $e->getMessage() . ($sql !== '' ? "\nQuery: {$sql}" : '');
     error_log('[db] ' . $detail);
 
-    if (config('debug')) {
-        http_response_code(500);
-        header('Content-Type: text/html; charset=utf-8');
-        echo '<h1>Databasefout</h1><pre>' . htmlspecialchars($detail, ENT_QUOTES, 'UTF-8') . '</pre>';
-        exit;
-    }
-
     fail_page(
         'We zijn zo terug',
         'We zijn het spel eventjes aan het bijwerken. Meestal duurt dat maar een paar ' .
         'minuten — vernieuw deze pagina zo nog eens. Blijft dit lang duren, laat het dan ' .
-        'weten aan de beheerder.'
+        'weten aan de beheerder.',
+        503,
+        config('debug') ? $detail : null
     );
 }
