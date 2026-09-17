@@ -157,6 +157,7 @@ $paginas = [
     'admin/ban.php'      => 'admin',
     'admin/addmulti.php' => 'admin',
     'admin/items.php'  => 'baas',
+    'admin/autos.php'  => 'baas',
     'admin/premiumlog.php'   => 'admin',
     'admin/premiumstats.php' => 'admin',
     'admin/advertenties.php' => 'baas',
@@ -467,5 +468,45 @@ $cronTijd = (int) $db->query(
 check('eigenaar kan de taak forceren, ook als hij nog niet aan de beurt was',
     $kogelsNaBaas === 100, 'kogels ' . $kogelsNaBaas);
 check('de crontijd is zojuist bijgewerkt', $cronTijd < 5, $cronTijd . ' seconden geleden');
+
+// --- Deel 8: de autocatalogus beheren ---------------------------------------
+
+kop('admin/autos.php: toevoegen, bewerken, dubbele naam weigeren, verwijderen');
+
+$db->exec("DELETE FROM cars WHERE naam LIKE 'Testauto%'");
+
+$tokenAutos = tok(haal('admin/autos.php', null, $baas)['body']);
+haal('admin/autos.php', ['_token' => $tokenAutos, 'actie' => 'toevoegen',
+    'auto' => 'Testauto', 'naam' => 'Testauto', 'url' => 'images/autos/test.jpg',
+    'waarde' => '12345'], $baas);
+
+$nieuw = $db->query("SELECT * FROM cars WHERE naam = 'Testauto'")->fetch();
+check('de auto is toegevoegd met precies deze waarde',
+    $nieuw !== false && (int) $nieuw['waarde'] === 12345, json_encode($nieuw));
+
+$tokenAutos2 = tok(haal('admin/autos.php', null, $baas)['body']);
+haal('admin/autos.php', ['_token' => $tokenAutos2, 'actie' => 'toevoegen',
+    'auto' => 'Testauto 2', 'naam' => 'Testauto', 'url' => '', 'waarde' => '1'], $baas);
+
+$aantalGelijkeNaam = (int) $db->query(
+    "SELECT COUNT(*) FROM cars WHERE naam = 'Testauto'"
+)->fetchColumn();
+check('een tweede auto met dezelfde naam wordt geweigerd', $aantalGelijkeNaam === 1,
+    (string) $aantalGelijkeNaam);
+
+$id = (int) $nieuw['id'];
+$tokenAutos3 = tok(haal('admin/autos.php', null, $baas)['body']);
+haal('admin/autos.php', ['_token' => $tokenAutos3, 'actie' => 'opslaan', 'id' => (string) $id,
+    'auto' => 'Testauto', 'naam' => 'Testauto', 'url' => '', 'waarde' => '99999'], $baas);
+
+$waardeNa = (int) $db->query("SELECT waarde FROM cars WHERE id = {$id}")->fetchColumn();
+check('bewerken werkt de waarde bij', $waardeNa === 99999, (string) $waardeNa);
+
+$tokenAutos4 = tok(haal('admin/autos.php', null, $baas)['body']);
+haal('admin/autos.php', ['_token' => $tokenAutos4, 'actie' => 'verwijderen', 'id' => (string) $id],
+    $baas);
+
+$bestaatNog = (int) $db->query("SELECT COUNT(*) FROM cars WHERE id = {$id}")->fetchColumn();
+check('de auto is verwijderd', $bestaatNog === 0, (string) $bestaatNog);
 
 samenvatting();
