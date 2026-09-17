@@ -5,7 +5,7 @@
  * Vervangt de oude frameset. Ingelogde spelers gaan meteen door naar hun status.
  *
  * Kan dezelfde advertentiecode tonen als advertentie.php (aan/uit op
- * admin/premium.php), voor bezoekers die nog niet ingelogd zijn. Daarom krijgt
+ * admin/advertenties.php), voor bezoekers die nog niet ingelogd zijn. Daarom krijgt
  * ook deze pagina het ruimere beleid dat advertentienetwerken nodig hebben,
  * ongeacht of de advertentie op dit moment aanstaat — dat weet je pas na het
  * laden van inc/premium.php, en de header moet eerder verstuurd worden.

@@ -157,7 +157,11 @@ $paginas = [
     'admin/ban.php'      => 'admin',
     'admin/addmulti.php' => 'admin',
     'admin/items.php'  => 'baas',
-    'admin/premium.php' => 'admin',
+    'admin/premiumlog.php'   => 'admin',
+    'admin/premiumstats.php' => 'admin',
+    'admin/advertenties.php' => 'baas',
+    'admin/diamanten.php'    => 'baas',
+    'admin/toekennen.php'    => 'admin',
     'admin/getuigen.php' => 'admin',
     'admin/bo.php'       => 'baas',
     'admin/klikmissies.php' => 'admin',
@@ -180,39 +184,35 @@ foreach ($paginas as $pagina => $vanaf) {
         $mag === [] ? 'niemand' : implode(', ', $mag));
 }
 
-// Op admin/premium.php mag een admin de veilige acties, maar niet de
-// advertentiecode of de balansinstellingen — die blijven voor de eigenaar,
-// want dat veld gaat ongefilterd naar de browser van elke speler.
-kop('admin/premium.php: admin mag geen advertentiecode of balans aanpassen');
+// admin/advertenties.php en admin/diamanten.php mogen alleen de eigenaar in
+// — die instellingen gaan ongefilterd naar de browser van elke speler, of
+// sturen de hele economie. Een admin komt de pagina zelf al niet op (zie de
+// rechtentabel hierboven); dit bevestigt dat er dan ook werkelijk niets
+// verandert.
+kop('admin/advertenties.php en admin/diamanten.php: een admin komt er niet in, en er verandert niets');
 
 $db->exec("DELETE FROM instellingen WHERE naam IN ('ads_html', 'premium_prijs')");
 
-$tokenAdmin = tok(haal('admin/premium.php', null, $admin)['body']);
-haal('admin/premium.php', ['_token' => $tokenAdmin, 'actie' => 'advertentie',
-    'html' => '<script>alert(1)</script>', 'interval' => '10'], $admin);
+$rAdv = haal('admin/advertenties.php',
+    ['html' => '<script>alert(1)</script>', 'interval' => '10'], $admin);
+$adsHtml = $db->query("SELECT waarde FROM instellingen WHERE naam = 'ads_html'")->fetchColumn();
 
-$adsHtml = $db->query(
-    "SELECT waarde FROM instellingen WHERE naam = 'ads_html'"
-)->fetchColumn();
+check('admin kan de advertentiecode niet zetten', $rAdv['code'] !== 200 && $adsHtml === false,
+    'HTTP ' . $rAdv['code'] . ', ads_html: ' . var_export($adsHtml, true));
 
-check('admin kan de advertentiecode niet zetten', $adsHtml === false,
-    'ads_html: ' . var_export($adsHtml, true));
+$rDia = haal('admin/diamanten.php',
+    ['kans' => '1', 'prijs' => '1', 'kofi' => 'https://voorbeeld.nl'], $admin);
+$premiumPrijs = $db->query("SELECT waarde FROM instellingen WHERE naam = 'premium_prijs'")->fetchColumn();
 
-haal('admin/premium.php', ['_token' => $tokenAdmin, 'actie' => 'balans',
-    'kans' => '1', 'prijs' => '1', 'kofi' => 'https://voorbeeld.nl'], $admin);
+check('admin kan de premiumprijs niet zetten', $rDia['code'] !== 200 && $premiumPrijs === false,
+    'HTTP ' . $rDia['code'] . ', premium_prijs: ' . var_export($premiumPrijs, true));
 
-$premiumPrijs = $db->query(
-    "SELECT waarde FROM instellingen WHERE naam = 'premium_prijs'"
-)->fetchColumn();
-
-check('admin kan de premiumprijs niet zetten', $premiumPrijs === false,
-    'premium_prijs: ' . var_export($premiumPrijs, true));
-
-kop('admin/premium.php: admin mag wel rechtstreeks premiumdagen toekennen');
+kop('admin/toekennen.php: admin mag wel rechtstreeks premiumdagen toekennen');
 
 $db->exec("UPDATE users SET premium_tot = NULL WHERE login = 'Speler'");
 
-haal('admin/premium.php', ['_token' => $tokenAdmin, 'actie' => 'dagen',
+$tokenToekennen = tok(haal('admin/toekennen.php', null, $admin)['body']);
+haal('admin/toekennen.php', ['_token' => $tokenToekennen, 'actie' => 'dagen',
     'speler2' => 'Speler', 'dagen' => '7'], $admin);
 
 $premiumTot    = (string) $db->query(

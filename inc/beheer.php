@@ -30,11 +30,13 @@ function beheerpaginas(): array
         'poll.php'     => ['Polls',           LEVEL_ADMIN, 'Inhoud'],
         'getuigen.php' => ['Ooggetuigen',     LEVEL_ADMIN, 'Spelwereld'],
         'klikmissies.php' => ['Klikmissies',  LEVEL_ADMIN, 'Spelwereld'],
-        // De pagina zelf mag een admin in; de advertentiecode en de
-        // balansinstellingen erop blijven daarbinnen apart op eigenaarsniveau
-        // afgeschermd, want dat veld gaat ongefilterd bij elke speler in de
-        // browser terecht.
-        'premium.php'  => ['Premium',         LEVEL_ADMIN, 'Economie'],
+        'premiumlog.php'   => ['Logs',              LEVEL_ADMIN, 'Economie'],
+        'premiumstats.php' => ['Statistieken',      LEVEL_ADMIN, 'Economie'],
+        // Deze twee mogen alleen de eigenaar in: de advertentiecode gaat
+        // ongefilterd bij elke speler in de browser terecht.
+        'advertenties.php' => ['Advertenties',      LEVEL_OWNER, 'Economie'],
+        'diamanten.php'    => ['Diamanten en prijs', LEVEL_OWNER, 'Economie'],
+        'toekennen.php'    => ['Toekennen',         LEVEL_ADMIN, 'Economie'],
         'items.php'    => ['Items',           LEVEL_OWNER, 'Spelwereld'],
         'drdrpr.php'   => ['Steden',          LEVEL_OWNER, 'Spelwereld'],
         'bo.php'       => ['Speler bewerken', LEVEL_OWNER, 'Spelers'],
@@ -189,12 +191,20 @@ function beheer_speler(string $naam): array
     return $speler;
 }
 
-/** Toon een korte regel met wie wat wanneer deed. */
-function beheer_logregels(string $area, int $aantal = 25): void
+/**
+ * Toon een korte regel met wie wat wanneer deed.
+ *
+ * @param string|string[] $area Eén gebied, of meerdere die bij elkaar horen
+ *                               (bijv. 'premium' en 'diamant' samen).
+ */
+function beheer_logregels(string|array $area, int $aantal = 25): void
 {
+    $gebieden  = is_array($area) ? $area : [$area];
+    $plekken   = implode(',', array_fill(0, count($gebieden), '?'));
+
     $regels = q_all(
-        'SELECT * FROM `logs` WHERE `area` = ? ORDER BY `time` DESC LIMIT ' . (int) $aantal,
-        [$area]
+        "SELECT * FROM `logs` WHERE `area` IN ({$plekken}) ORDER BY `time` DESC LIMIT " . (int) $aantal,
+        $gebieden
     );
 
     if ($regels === []) {

@@ -55,8 +55,7 @@ check('standaard geen advertentieblok op de voorpagina',
     !str_contains($uit, 'class="advertentie"'));
 
 $baas = login('Baas', 'baaswachtwoord12345');
-doe('admin/premium.php', [
-    'actie'    => 'advertentie',
+doe('admin/advertenties.php', [
     'html'     => '<div id="testadvertentie">Test-advertentie</div>',
     'interval' => '25',
     'outgame'  => '1',
@@ -68,8 +67,7 @@ check('advertentieblok verschijnt als de instelling aanstaat',
         && str_contains($aan, '<div id="testadvertentie">Test-advertentie</div>'));
 
 // Instelling weer uitzetten, anders draait elke volgende pagina met reclame.
-doe('admin/premium.php', [
-    'actie'    => 'advertentie',
+doe('admin/advertenties.php', [
     'html'     => '',
     'interval' => '25',
 ], $baas);

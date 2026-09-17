@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 defined('BV_INC') || exit;
 
-// Standaardwaarden. De beheerder kan ze omzetten op admin/premium.php.
+// Standaardwaarden. De beheerder kan ze omzetten op admin/diamanten.php.
 const DIAMANT_KANS_STANDAARD   = 500;   // één op de zoveel
 const PREMIUM_DAGEN            = 14;
 const PREMIUM_PRIJS_STANDAARD  = 250;   // diamanten
@@ -119,6 +119,30 @@ function premium_verlengen(int $userId, int $dagen = PREMIUM_DAGEN): void
           WHERE `id` = ?',
         [$dagen, $userId]
     );
+}
+
+/**
+ * Maak een unieke premiumcode en sla hem op.
+ *
+ * Dit is ook het aanknopingspunt voor een echte betaalprovider: roep deze
+ * functie aan zodra een betaling bevestigd is, en stuur de code naar de koper.
+ */
+function premium_code_maken(string $voor): string
+{
+    // Zonder tekens die op elkaar lijken, zodat overtypen makkelijk blijft.
+    $tekens = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    do {
+        $code = '';
+        for ($i = 0; $i < 12; $i++) {
+            $code .= $tekens[random_int(0, strlen($tekens) - 1)];
+        }
+        $bestaat = (int) q_val('SELECT COUNT(*) FROM `donate` WHERE `code` = ?', [$code], 0);
+    } while ($bestaat > 0);
+
+    q('INSERT INTO `donate` (`door`, `code`, `status`) VALUES (?, ?, 0)', [$voor, $code]);
+
+    return $code;
 }
 
 // --- Diamanten --------------------------------------------------------------
