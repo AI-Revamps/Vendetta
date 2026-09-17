@@ -186,13 +186,15 @@ de andere taken.
 INSERT INTO `beheer_geschiedenis`
     (`dag`, `spelers`, `levend`, `online`, `geld_totaal`,
      `nieuwe_registraties`, `vast`, `bans_totaal`, `families`)
-VALUES (CURDATE(), :spelers, :levend, :online, :geld,
-        :nieuw, :vast, :bans, :families)
+VALUES (CURDATE(), :a, :b, :c, :d, :e, :f, :g, :h)
 ON DUPLICATE KEY UPDATE
-    `spelers` = :spelers, `levend` = :levend, `online` = :online,
-    `geld_totaal` = :geld, `nieuwe_registraties` = :nieuw,
-    `vast` = :vast, `bans_totaal` = :bans, `families` = :families
+    `spelers` = :a2, `levend` = :b2, `online` = :c2, `geld_totaal` = :d2,
+    `nieuwe_registraties` = :e2, `vast` = :f2, `bans_totaal` = :g2, `families` = :h2
 ```
+
+(Elke waarde twee keer meegeven, onder twee verschillende plaatshouders — `:a`
+en `:a2` voor hetzelfde cijfer — want benoemde plaatshouders mogen hier niet
+herhaald worden, zie `CLAUDE.md`.)
 
 Bronwaarden: `spelers` = `COUNT(*)` waar `activated = 1`; `levend` = idem met
 `status = 'levend'`; `online` = `COUNT(*)` waar `online` binnen 15 minuten;
