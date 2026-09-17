@@ -149,7 +149,7 @@ $sessies = ['speler' => $speler, 'mod' => $mod, 'admin' => $admin, 'baas' => $ba
 
 /** pagina => het laagste niveau dat erbij mag */
 $paginas = [
-    'admin.php'        => 'mod',
+    'admin/dashboard.php' => 'mod',
     'adm-online.php'   => 'mod',
     'adm-warn.php'     => 'mod',
     'adm-search.php'   => 'mod',

@@ -133,21 +133,7 @@ function menu_groups(array $user): array
 
     if ((int) $user['level'] >= LEVEL_MODERATOR) {
         $groepen['Beheer'] = [
-            'adm-search.php'   => 'Zoeken',
-            'adm-online.php'   => 'Online',
-            'adm-addnews.php'  => 'Nieuws',
-            'adm-ban.php'      => 'Bannen',
-            'adm-addmulti.php' => 'Multi-accounts',
-            'adm-msg.php'      => 'Adminbericht',
-            'adm-bo.php'       => 'Userstats',
-            'adm-drdrpr.php'   => 'Steden',
-            'adm-prison.php'   => 'Gevangenis',
-            'adm-items.php'    => 'Items',
-            'adm-shame.php'    => 'Wall of Shame',
-            'adm-poll.php'     => 'Poll',
-            'adm-getuigen.php' => 'Ooggetuigen',
-            'adm-premium.php'  => 'Premium',
-            'adm-klikmissies.php' => 'Klikmissies',
+            'admin/dashboard.php' => 'Beheerdashboard',
         ];
     }
 
@@ -218,13 +204,17 @@ function logo_url(string $bestand): ?string
 
 // --- Opbouw van de pagina ---------------------------------------------------
 
-/** Open de pagina: <head>, kopbalk, menu en de opening van het inhoudsvak. */
-function layout_header(string $titel = ''): void
+/**
+ * De <head> die spelers- en beheerschil delen: doctype, meta, stylesheet(s),
+ * favicon. $extraCss komt ná style.css, voor een schil-specifiek stijlblad
+ * (zoals assets/css/beheer.css).
+ *
+ * @param string[] $extraCss Paden relatief aan de hoofdmap.
+ */
+function layout_head_html(string $titel, array $extraCss = []): void
 {
-    $user     = current_user();
     $siteNaam = (string) config('site.name', 'Black Vendetta');
     $volTitel = $titel !== '' ? "{$titel} - {$siteNaam}" : $siteNaam;
-    $huidig   = current_page();
 
     echo '<!doctype html>' . "\n";
     echo '<html lang="nl">' . "\n<head>\n";
@@ -233,10 +223,24 @@ function layout_header(string $titel = ''): void
     echo '<title>' . e($volTitel) . "</title>\n";
     echo '<link rel="stylesheet" href="' . e(asset_url('assets/css/style.css')) . '">' . "\n";
 
+    foreach ($extraCss as $pad) {
+        echo '<link rel="stylesheet" href="' . e(asset_url($pad)) . '">' . "\n";
+    }
+
     $favicon = logo_url('favicon.png');
     echo '<link rel="icon" href="' . e($favicon ?? url('favicon.ico')) . '">' . "\n";
     echo '<meta name="theme-color" content="#0a1120">' . "\n";
     echo "</head>\n";
+}
+
+/** Open de pagina: <head>, kopbalk, menu en de opening van het inhoudsvak. */
+function layout_header(string $titel = ''): void
+{
+    $user     = current_user();
+    $siteNaam = (string) config('site.name', 'Black Vendetta');
+    $huidig   = current_page();
+
+    layout_head_html($titel);
 
     // Zijmenu, statuspaneel en onderbalk horen bij een levende, ingelogde
     // speler. Zijn ze er niet, dan moet het raster één kolom zijn in plaats

@@ -153,7 +153,6 @@ $verwacht = [
     'fam.php'        => 'Familie',
     'famman.php'     => 'Familie',
     'roulette.php'   => 'Gokken',
-    'adm-search.php' => 'Beheer',
 ];
 
 foreach ($verwacht as $pagina => $groep) {
@@ -184,6 +183,23 @@ foreach ($blokken[0] as $blok) {
 check('hoogstens één groep open', count($blokken[0]) === 1, count($blokken[0]) . ' open');
 check('zichtbare items blijven beperkt', $zichtbaar <= 15, $zichtbaar . ' items');
 check('alle groepen staan er nog', substr_count($html, '<summary>') >= 6);
+
+// --- Beheerschil -------------------------------------------------------
+
+kop('beheerschil: eigen kopbalk en zijmenu, geen spelonderdelen');
+
+$baasJar = login('Baas', 'baaswachtwoord12345');
+$html    = haal('admin/dashboard.php', null, $baasJar)['body'];
+
+check('geen statuspaneel', !str_contains($html, 'class="statuspaneel"'));
+check('geen onderbalk', !str_contains($html, 'class="onderbalk"'));
+check('geen spelmodus-klasse op body', !str_contains($html, '<body class="spelmodus"'));
+check('wel het beheer-zijmenu', str_contains($html, 'id="zijmenu"'));
+check('wel een link terug naar het spel', str_contains($html, 'Terug naar het spel'));
+check('toont wie is ingelogd', str_contains($html, '>Baas<'));
+
+// De blokken hierna verwachten Speler weer als de ambient sessie.
+login('Speler', 'spelerwachtwoord123');
 
 // --- Klikmissies: badge in het menu ------------------------------------------
 
