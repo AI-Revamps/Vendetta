@@ -370,7 +370,44 @@ function cron_interval_nl(int $seconden): string
         return ($seconden / 3600) . ' uur';
     }
     if ($seconden % 60 === 0) {
-        return ($seconden / 60) . ' minuten';
+        $n = $seconden / 60;
+        return $n . ' minu' . ($n === 1 ? 'ut' : 'ten');
     }
     return $seconden . ' seconden';
+}
+
+/**
+ * Draai één taak nu meteen, los van of hij "aan de beurt" is. Voor de
+ * "nu draaien"-knop op het beheerdashboard.
+ *
+ * Gebruikt dezelfde lock als de gewone, automatische uitvoering: een taak
+ * die net vanzelf draait (op een druk moment, via cron_mode 'request') kan
+ * dus niet ook nog eens handmatig gestart worden, en andersom.
+ *
+ * @throws SpelFout Als de taak niet bestaat, of al ergens anders draait.
+ */
+function cron_run_nu(string $naam): void
+{
+    $taken = cron_tasks();
+
+    if (!isset($taken[$naam])) {
+        throw new SpelFout('Onbekende taak.');
+    }
+
+    if (!db_try_lock('bv_cron_' . $naam)) {
+        throw new SpelFout('Deze taak draait al ergens anders; probeer het straks opnieuw.');
+    }
+
+    try {
+        [, $taak] = $taken[$naam];
+        $taak();
+
+        q(
+            'INSERT INTO `cron` (`name`, `time`) VALUES (?, NOW())
+                 ON DUPLICATE KEY UPDATE `time` = NOW()',
+            [$naam]
+        );
+    } finally {
+        db_release_lock('bv_cron_' . $naam);
+    }
 }

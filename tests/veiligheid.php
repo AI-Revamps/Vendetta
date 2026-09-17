@@ -442,4 +442,30 @@ check('is geldige JSON', $data !== null, json_last_error_msg());
 check('bevat de drie verwachte sleutels',
     is_array($data) && isset($data['stad'], $data['rang'], $data['trend']));
 
+// --- Deel 7: een crontaak handmatig forceren, alleen de eigenaar mag dat ----
+
+kop('cron nu draaien: alleen de eigenaar mag een taak forceren');
+
+$db->exec("UPDATE stad SET kogels = 5 WHERE stad = 'Brussel'");
+$db->exec("UPDATE cron SET time = NOW() WHERE name = 'kogels'");
+
+$tokenMod = tok(haal('admin/dashboard.php', null, $mod)['body']);
+$rMod = haal('admin/dashboard.php', ['_token' => $tokenMod, 'taak' => 'kogels'], $mod);
+
+$kogelsNaMod = (int) $db->query("SELECT kogels FROM stad WHERE stad = 'Brussel'")->fetchColumn();
+check('moderator kan geen taak forceren', $rMod['code'] !== 200 && $kogelsNaMod === 5,
+    'HTTP ' . $rMod['code'] . ', kogels ' . $kogelsNaMod);
+
+$tokenBaas = tok(haal('admin/dashboard.php', null, $baas)['body']);
+haal('admin/dashboard.php', ['_token' => $tokenBaas, 'taak' => 'kogels'], $baas);
+
+$kogelsNaBaas = (int) $db->query("SELECT kogels FROM stad WHERE stad = 'Brussel'")->fetchColumn();
+$cronTijd = (int) $db->query(
+    "SELECT UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(time) FROM cron WHERE name = 'kogels'"
+)->fetchColumn();
+
+check('eigenaar kan de taak forceren, ook als hij nog niet aan de beurt was',
+    $kogelsNaBaas === 100, 'kogels ' . $kogelsNaBaas);
+check('de crontijd is zojuist bijgewerkt', $cronTijd < 5, $cronTijd . ' seconden geleden');
+
 samenvatting();

@@ -20,7 +20,30 @@ require BV_INC . '/beheer.php';
 
 $user = require_level(LEVEL_MODERATOR);
 
+$melding = null;
+$type    = 'info';
+
+if (is_post()) {
+    csrf_check();
+    // Strenger dan het dashboard zelf: sommige taken (loterij, dagelijkse
+    // reset) hebben echte spelimpact als je ze buiten hun ritme laat draaien.
+    require_level(LEVEL_OWNER);
+
+    try {
+        cron_run_nu(post('taak'));
+        $melding = 'Taak "' . post('taak') . '" is uitgevoerd.';
+        $type    = 'ok';
+    } catch (SpelFout $e) {
+        $melding = $e->getMessage();
+        $type    = 'fout';
+    }
+}
+
 beheer_header($user, 'dashboard.php');
+
+if ($melding !== null) {
+    notice(e($melding), $type);
+}
 
 $cijfers = q_row(
     "SELECT
@@ -60,9 +83,12 @@ panel_close();
 $cronRijen  = q_all('SELECT `name`, `time` FROM `cron`');
 $cronLaatst = array_combine(array_column($cronRijen, 'name'), array_column($cronRijen, 'time'));
 
+$magForceren = (int) $user['level'] >= LEVEL_OWNER;
+
 panel_open('Cron-status');
 echo '<div class="tabelwikkel"><table class="lijst">';
-echo '<thead><tr><th>Taak</th><th>Laatst gedraaid</th><th>Interval</th><th>Status</th></tr></thead><tbody>';
+echo '<thead><tr><th>Taak</th><th>Laatst gedraaid</th><th>Interval</th><th>Status</th>'
+   . ($magForceren ? '<th></th>' : '') . '</tr></thead><tbody>';
 foreach (cron_tasks() as $taakNaam => $taakRij) {
     $interval = $taakRij[0];
     $laatst   = $cronLaatst[$taakNaam] ?? null;
@@ -73,6 +99,11 @@ foreach (cron_tasks() as $taakNaam => $taakRij) {
     echo '<td>' . ($laatst !== null ? e(datetime_nl($laatst)) : 'nog nooit') . '</td>';
     echo '<td>' . e(cron_interval_nl($interval)) . '</td>';
     echo '<td>' . ($opTijd ? 'recent gedraaid' : 'moet nog draaien') . '</td>';
+    if ($magForceren) {
+        echo '<td><form method="post">' . csrf_field()
+           . '<input type="hidden" name="taak" value="' . e($taakNaam) . '">'
+           . '<button type="submit" class="knop">Nu draaien</button></form></td>';
+    }
     echo '</tr>';
 }
 echo '</tbody></table></div>';
