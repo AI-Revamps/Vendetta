@@ -278,7 +278,7 @@ kop('elk formulier draagt een token');
 
 $zonderToken = [];
 
-foreach (array_map('basename', glob(BV_WORTEL . '/*.php') ?: []) as $pagina) {
+foreach (alle_paginas() as $pagina) {
     if (in_array($pagina, ['cron.php', 'logout.php'], true)) {
         continue;
     }
@@ -303,7 +303,7 @@ kop('geen handelingen achter een gewone link');
 
 $verdacht = [];
 
-foreach (array_map('basename', glob(BV_WORTEL . '/*.php') ?: []) as $pagina) {
+foreach (alle_paginas() as $pagina) {
     $body = haal($pagina, null, $baas)['body'];
 
     preg_match_all('#href="([^"]*(?:actie|action|verwijder|delete)=[^"]*)"#i',

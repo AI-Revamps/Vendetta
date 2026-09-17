@@ -18,7 +18,7 @@ login('Baas', 'baaswachtwoord12345');
 /** Deze zijn geen gewone pagina's. */
 const OVERSLAAN = ['cron.php', 'logout.php'];
 
-$paginas = array_map('basename', glob(BV_WORTEL . '/*.php') ?: []);
+$paginas = alle_paginas();
 $stuk    = 0;
 
 foreach ($paginas as $pagina) {

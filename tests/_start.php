@@ -233,6 +233,24 @@ function totaal_geld(?PDO $db = null): int
         ->fetchColumn();
 }
 
+/**
+ * Alle paginabestanden: de hoofdmap en submappen zoals admin/. Bestanden in
+ * de hoofdmap komen terug als kale naam ("home.php"), bestanden in een
+ * submap met hun relatieve pad ("admin/ban.php") — zodat haal() en mooi()
+ * ze rechtstreeks kunnen opvragen.
+ */
+function alle_paginas(): array
+{
+    $hoofdmap = array_map('basename', glob(BV_WORTEL . '/*.php') ?: []);
+
+    $admin = array_map(
+        static fn (string $pad): string => 'admin/' . basename($pad),
+        glob(BV_WORTEL . '/admin/*.php') ?: []
+    );
+
+    return array_merge($hoofdmap, $admin);
+}
+
 // --- Uitvoer ----------------------------------------------------------------
 
 function kop(string $tekst): void

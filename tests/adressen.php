@@ -100,7 +100,7 @@ kop('alle pagina\'s zijn zonder .php te bereiken');
 $overslaan = ['cron.php', 'logout.php', 'img.php'];
 $paginas   = [];
 
-foreach (array_map('basename', glob(BV_WORTEL . '/*.php') ?: []) as $naam) {
+foreach (alle_paginas() as $naam) {
     if (!in_array($naam, $overslaan, true)) {
         $paginas[] = substr($naam, 0, -4);
     }
