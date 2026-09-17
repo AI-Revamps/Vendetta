@@ -3,8 +3,9 @@
 ## Doel
 
 Het adminpaneel loskoppelen van de spelerslay-out tot een eigen dashboard op
-`/admin`: alle beheerfuncties overzichtelijk ingedeeld in categorieën, plus
-statistieken en grafieken die spelers niet te zien krijgen.
+`/admin`: alle beheerfuncties overzichtelijk ingedeeld in categorieën, fysiek
+verplaatst naar een eigen map, plus statistieken en grafieken die spelers
+niet te zien krijgen.
 
 ## Huidige situatie
 
@@ -46,10 +47,11 @@ de grafieken.
 categorie. Dat blijft zo de ene plek waaruit zowel de rechtencontrole als het
 menu wordt opgebouwd — geen aparte lijst om synchroon te houden.
 
-Alle achttien bestanden (`admin.php` + de zeventien `adm-*.php`) krijgen
-dezelfde mechanische aanpassing: de regel `layout_header('Beheer'); ` +
+Alle achttien bestanden (`admin.php` + de zeventien `adm-*.php`) krijgen in
+dezelfde bewerkingsslag drie wijzigingen: de verplaatsing naar `admin/` (zie
+hieronder), en de regel `layout_header('Beheer'); ` +
 `beheer_menu($user, '<bestand>');` wordt `beheer_header($user, '<bestand>');`,
-en de afsluitende `layout_footer();` wordt `beheer_footer();`. Waar
+met de afsluitende `layout_footer();` naar `beheer_footer();`. Waar
 `beheer_start()` gebruikt wordt (nu alleen `adm-online.php`), verandert die
 functie zelf vanbinnen mee en hoeft de aanroeper niets aan te passen.
 
@@ -57,18 +59,77 @@ Nieuw stijlblad `assets/css/beheer.css`, alleen geladen op beheerpagina's.
 Kleuren en lettertype blijven gedeeld met `style.css`; de kaarten- en
 dashboard-indeling staat los van de spelerslay-out.
 
-## Indeling: categorieën
+## Mapstructuur: verplaatsing naar `admin/`
 
-| Categorie | Pagina's |
+Alle beheerbestanden verhuizen naar een nieuwe map `admin/` in de hoofdmap.
+Het voorvoegsel `adm-` vervalt daarbij: de map maakt dat onderscheid al, dus
+een los voorvoegsel is dubbelop. `admin.php` zelf wordt **niet**
+`admin/index.php` maar `admin/dashboard.php` — een expliciete naam in plaats
+van op de map-index leunen. Gevolg: een kale `/admin/` toont niets vanzelf
+(geen `DirectoryIndex`-bestand); dat is geen probleem, want de enige weg naar
+het dashboard is de nieuwe "Beheer"-link in het spelmenu, die rechtstreeks
+naar `admin/dashboard.php` wijst.
+
+| Huidige naam | Nieuwe naam | Categorie |
+|---|---|---|
+| `admin.php` | `admin/dashboard.php` | Overzicht |
+| `adm-search.php` | `admin/search.php` | Spelers |
+| `adm-online.php` | `admin/online.php` | Spelers |
+| `adm-ban.php` | `admin/ban.php` | Spelers |
+| `adm-warn.php` | `admin/warn.php` | Spelers |
+| `adm-prison.php` | `admin/prison.php` | Spelers |
+| `adm-addmulti.php` | `admin/addmulti.php` | Spelers |
+| `adm-bo.php` | `admin/bo.php` | Spelers |
+| `adm-addnews.php` | `admin/addnews.php` | Inhoud |
+| `adm-poll.php` | `admin/poll.php` | Inhoud |
+| `adm-forum.php` | `admin/forum.php` | Inhoud |
+| `adm-shame.php` | `admin/shame.php` | Inhoud |
+| `adm-items.php` | `admin/items.php` | Spelwereld |
+| `adm-drdrpr.php` | `admin/drdrpr.php` | Spelwereld |
+| `adm-klikmissies.php` | `admin/klikmissies.php` | Spelwereld |
+| `adm-getuigen.php` | `admin/getuigen.php` | Spelwereld |
+| `adm-premium.php` | `admin/premium.php` | Economie |
+| `adm-msg.php` | `admin/msg.php` | Communicatie |
+
+Wat dat concreet raakt:
+
+- **`require __DIR__ . '/inc/bootstrap.php'`** wordt in elk verplaatst
+  bestand `require __DIR__ . '/../inc/bootstrap.php'` — één map dieper.
+- **`beheerpaginas()`** in `inc/beheer.php` blijft gesleuteld op de kale
+  nieuwe bestandsnaam (`'ban.php'`, niet `'admin/ban.php'`). Dat is
+  bewust: `current_page()` (`inc/layout.php`) geeft via `basename()` altijd
+  de kale bestandsnaam terug, dus de rechtencontrole en de
+  actief-in-het-menu-vergelijking blijven op precies dezelfde manier werken
+  als nu, ongeacht de map.
+- Nieuwe functie **`beheer_url(string $bestand): string`** in
+  `inc/beheer.php`, simpelweg `url('admin/' . $bestand)`. Dit is de enige
+  plek die weet dat beheerbestanden in `admin/` staan; alle links naar een
+  beheerpagina — het zijmenu in `beheer_header()`, en de kruislinks tussen
+  beheerpagina's onderling — gaan hierdoorheen in plaats van rechtstreeks
+  `url()` aan te roepen.
+- **Bestaande kruislinks** die nu `url('adm-iets.php')` gebruiken
+  (`adm-addmulti.php`, `adm-addnews.php`, `adm-forum.php`,
+  `adm-klikmissies.php`, `adm-online.php`, `adm-poll.php`, `adm-prison.php`,
+  `adm-search.php`, en de link naar `admin.php` in `inc/beheer.php`) worden
+  `beheer_url('iets.php')`.
+- **Het spelmenu** (`menu_groups()` in `inc/layout.php`) verliest de huidige
+  platte `'Beheer'`-groep met vijftien losse links. Daarvoor in de plaats komt
+  één link voor `LEVEL_MODERATOR` en hoger: `'Beheer' => ['admin/dashboard.php'
+  => 'Beheerdashboard']`. Spelers die geen staflid zijn, zien deze groep
+  helemaal niet — zoals nu ook al het geval is.
+
+## Indeling: categorieën in het beheerzijmenu
+
+| Categorie | Pagina's (nieuwe namen) |
 |---|---|
-| Overzicht | `admin.php` (los bovenaan, geen groep) |
-| Spelers | `adm-search`, `adm-online`, `adm-ban`, `adm-warn`, `adm-prison`, `adm-addmulti`, `adm-bo` |
-| Inhoud | `adm-addnews`, `adm-poll`, `adm-forum`, `adm-shame` |
-| Spelwereld | `adm-items`, `adm-drdrpr`, `adm-klikmissies`, `adm-getuigen` |
-| Economie | `adm-premium` |
-| Communicatie | `adm-msg` |
+| Overzicht | `dashboard.php` (los bovenaan, geen groep) |
+| Spelers | `search.php`, `online.php`, `ban.php`, `warn.php`, `prison.php`, `addmulti.php`, `bo.php` |
+| Inhoud | `addnews.php`, `poll.php`, `forum.php`, `shame.php` |
+| Spelwereld | `items.php`, `drdrpr.php`, `klikmissies.php`, `getuigen.php` |
+| Economie | `premium.php` |
+| Communicatie | `msg.php` |
 
-## Dashboard: `admin.php` wordt het overzicht
+## Dashboard: `admin/dashboard.php` wordt het overzicht
 
 **Nu-cijfers** (geen nieuwe tabel nodig, rechtstreeks uit bestaande
 tabellen):
@@ -184,9 +245,10 @@ tegenover de winst.
 
 ## Reikwijdte
 
-**Wel:** eigen adminschil (`beheer_header()`/`beheer_footer()`), indeling in
-categorieën, uitgebreide nu-cijfers, nieuwe trendtabel plus cron-taak, vijf
-grafieken op `admin.php`, zelf-gehoste Chart.js.
+**Wel:** verplaatsing naar `admin/` zonder `adm-`-voorvoegsel, eigen
+adminschil (`beheer_header()`/`beheer_footer()`), indeling in categorieën,
+uitgebreide nu-cijfers, nieuwe trendtabel plus cron-taak, vijf grafieken op
+`admin/dashboard.php`, zelf-gehoste Chart.js.
 
 **Niet:**
 
@@ -201,21 +263,34 @@ grafieken op `admin.php`, zelf-gehoste Chart.js.
   aanstaat, dat hoeft niet aangepast te worden.
 - Geen extra mobiele herontwerp buiten het hergebruiken van het bestaande
   uitklap-patroon.
+- Geen `admin/index.php`: een kale `/admin/` toont niets, alleen
+  `/admin/dashboard` (of met `.php`) doet dat. Bewuste keuze, zie boven.
 
 ## Testen
 
-- `tests/rook.php`: `admin.php` en alle `adm-*.php` moeten schoon laden met
-  de nieuwe schil.
-- `tests/opbouw.php`: nieuw geval voor de beheerschil (geen statuspaneel,
-  geen onderbalk, wel het beheer-zijmenu met categorieën) naast de
-  bestaande spelerstoestanden.
-- `tests/veiligheid.php`: `require_level()` blijft afgedwongen per pagina
-  via `beheer_header()`; het JSON-datablok op `admin.php` bevat geen
-  ongeëscapete tekst.
+`tests/rook.php`, `tests/adressen.php` en `tests/veiligheid.php` sommen nu
+pagina's op met `glob(BV_WORTEL . '/*.php')` — alleen de hoofdmap. Dat wordt
+`array_merge(glob(BV_WORTEL . '/*.php'), glob(BV_WORTEL . '/admin/*.php'))`
+(met de bestandsnaam voortaan relatief, dus `admin/ban.php` in plaats van
+`ban.php`, zodat `haal()` het juiste pad opvraagt). Zonder deze aanpassing
+zouden alle beheerpagina's stilzwijgend uit deze tests verdwijnen.
+
+- `tests/rook.php`: alle bestanden in `admin/` moeten schoon laden met de
+  nieuwe schil, net als `dashboard.php` zelf.
+- `tests/opbouw.php`: de letterlijke verwijzingen `'adm-premium.php'` en
+  `'adm-search.php'` worden `'admin/premium.php'` / `'admin/search.php'`;
+  nieuw geval voor de beheerschil (geen statuspaneel, geen onderbalk, wel
+  het beheer-zijmenu met categorieën) naast de bestaande
+  spelerstoestanden.
+- `tests/veiligheid.php`: dezelfde naamswijziging in de rechtentabel
+  (`'adm-online.php' => 'mod'` wordt `'admin/online.php' => 'mod'`,
+  enzovoort) en in elke `haal('adm-...', ...)`-aanroep. `require_level()`
+  blijft afgedwongen per pagina via `beheer_header()`; het JSON-datablok op
+  `dashboard.php` bevat geen ongeëscapete tekst.
 - Nieuwe controle (uitbreiding van een testbestand of een nieuw
   `tests/beheergeschiedenis.php`): `cron_geschiedenis_bijwerken()` twee keer
   kort na elkaar aanroepen levert precies één rij op voor vandaag, en de
   waarden in die rij kloppen met een losse controlequery op hetzelfde
   moment.
-- `tests/adressen.php`: bestaande beheeradressen blijven zonder `.php`
-  bereikbaar.
+- `tests/adressen.php`: de verplaatste beheeradressen blijven zonder `.php`
+  bereikbaar (bijv. `/admin/ban`).
