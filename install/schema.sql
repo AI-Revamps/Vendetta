@@ -651,6 +651,22 @@ CREATE TABLE IF NOT EXISTS `instellingen` (
   PRIMARY KEY (`naam`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Dagelijkse momentopname van kerncijfers, voor trendgrafieken op het
+-- beheerdashboard. Zonder deze tabel is een cijfer als "geld in omloop
+-- vorige week" achteraf niet meer te reconstrueren.
+CREATE TABLE IF NOT EXISTS `beheer_geschiedenis` (
+  `dag`                 date NOT NULL,
+  `spelers`             int unsigned NOT NULL DEFAULT 0,
+  `levend`              int unsigned NOT NULL DEFAULT 0,
+  `online`              int unsigned NOT NULL DEFAULT 0,
+  `geld_totaal`         bigint NOT NULL DEFAULT 0,
+  `nieuwe_registraties` int unsigned NOT NULL DEFAULT 0,
+  `vast`                int unsigned NOT NULL DEFAULT 0,
+  `bans_totaal`         int unsigned NOT NULL DEFAULT 0,
+  `families`            int unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`dag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Tijdstip waarop elke periodieke taak voor het laatst gedraaid heeft.
 CREATE TABLE IF NOT EXISTS `cron` (
   `name` varchar(16) NOT NULL,

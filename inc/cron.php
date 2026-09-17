@@ -127,6 +127,15 @@ function cron_tasks(): array
         'loterij' => [604800, static function (): void {
             loterij_trekken();
         }],
+
+        // Dagelijkse momentopname voor de trendgrafieken op het
+        // beheerdashboard. Kortere naam dan de tabel: `cron`.`name` is
+        // varchar(16), en "beheer_geschiedenis" (20 tekens) werd daar
+        // stilzwijgend afgekapt tot "beheer_geschiede" — met als gevolg dat
+        // cron_claim() nooit meer een rij raakte en de taak nooit liep.
+        'geschiedenis' => [86400, static function (): void {
+            beheer_geschiedenis_bijwerken();
+        }],
     ];
 }
 
@@ -255,6 +264,55 @@ function loterij_uitbetalen(array $winnaar, array $prijs, int $pot): void
     }
 
     log_action($naam, 'loterij', 'Prijs gewonnen: ' . $prijs['omschrijving']);
+}
+
+/**
+ * Dagelijkse momentopname van kerncijfers, voor de trendgrafieken op het
+ * beheerdashboard. `ON DUPLICATE KEY UPDATE` maakt dit onschadelijk als de
+ * taak per ongeluk twee keer op dezelfde dag draait: de tweede run
+ * overschrijft de eerste in plaats van een tweede rij te maken.
+ *
+ * Elke waarde staat twee keer in de parameterlijst, onder een andere naam
+ * (`a` voor INSERT, `a2` voor UPDATE) — benoemde plaatshouders mogen niet
+ * herhaald worden binnen één query.
+ */
+function beheer_geschiedenis_bijwerken(): void
+{
+    $cijfers = q_row(
+        "SELECT
+            (SELECT COUNT(*) FROM `users` WHERE `activated` = 1) AS spelers,
+            (SELECT COUNT(*) FROM `users`
+              WHERE `status` = 'levend' AND `activated` = 1)      AS levend,
+            (SELECT COUNT(*) FROM `users`
+              WHERE `online` > DATE_SUB(NOW(), INTERVAL 15 MINUTE)) AS online,
+            (SELECT IFNULL(SUM(`zak`) + SUM(`bank`), 0) FROM `users`) AS geld,
+            (SELECT COUNT(*) FROM `users`
+              WHERE DATE(`start`) = CURDATE())                    AS nieuw,
+            (SELECT COUNT(*) FROM `jail` WHERE `time` > NOW())    AS vast,
+            (SELECT COUNT(*) FROM `bans`)                         AS bans,
+            (SELECT COUNT(*) FROM `famillie`)                     AS families"
+    ) ?? [];
+
+    q(
+        'INSERT INTO `beheer_geschiedenis`
+            (`dag`, `spelers`, `levend`, `online`, `geld_totaal`,
+             `nieuwe_registraties`, `vast`, `bans_totaal`, `families`)
+         VALUES (CURDATE(), :a, :b, :c, :d, :e, :f, :g, :h)
+         ON DUPLICATE KEY UPDATE
+            `spelers` = :a2, `levend` = :b2, `online` = :c2,
+            `geld_totaal` = :d2, `nieuwe_registraties` = :e2,
+            `vast` = :f2, `bans_totaal` = :g2, `families` = :h2',
+        [
+            'a' => (int) ($cijfers['spelers'] ?? 0), 'a2' => (int) ($cijfers['spelers'] ?? 0),
+            'b' => (int) ($cijfers['levend'] ?? 0),  'b2' => (int) ($cijfers['levend'] ?? 0),
+            'c' => (int) ($cijfers['online'] ?? 0),  'c2' => (int) ($cijfers['online'] ?? 0),
+            'd' => (int) ($cijfers['geld'] ?? 0),    'd2' => (int) ($cijfers['geld'] ?? 0),
+            'e' => (int) ($cijfers['nieuw'] ?? 0),   'e2' => (int) ($cijfers['nieuw'] ?? 0),
+            'f' => (int) ($cijfers['vast'] ?? 0),    'f2' => (int) ($cijfers['vast'] ?? 0),
+            'g' => (int) ($cijfers['bans'] ?? 0),    'g2' => (int) ($cijfers['bans'] ?? 0),
+            'h' => (int) ($cijfers['families'] ?? 0),'h2' => (int) ($cijfers['families'] ?? 0),
+        ]
+    );
 }
 
 /** Is deze taak aan de beurt? Goedkope controle, zonder lock. */

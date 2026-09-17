@@ -176,8 +176,9 @@ onafhankelijk van de schil-verbouwing (taken 3-7) en de dashboard-inhoud
 - Produces: tabel `beheer_geschiedenis` (kolommen: `dag`, `spelers`,
   `levend`, `online`, `geld_totaal`, `nieuwe_registraties`, `vast`,
   `bans_totaal`, `families`); functie `beheer_geschiedenis_bijwerken(): void`
-  in `inc/cron.php`, aangeroepen via de taak `'beheer_geschiedenis'` in
-  `cron_tasks()`. Taak 8 leest deze tabel rechtstreeks met `q_all()`.
+  in `inc/cron.php`, aangeroepen via de taak `'geschiedenis'` in
+  `cron_tasks()` (kortere naam dan de tabel: `cron`.`name` is varchar(16)).
+  Taak 8 leest deze tabel rechtstreeks met `q_all()`.
 
 - [ ] **Stap 1: Tabel toevoegen aan `install/schema.sql`**
 
@@ -235,7 +236,7 @@ $db = tdb();
 kop('beheer_geschiedenis: de eerste keer schrijft meteen een rij voor vandaag');
 
 $db->exec("DELETE FROM beheer_geschiedenis WHERE dag = CURDATE()");
-$db->exec("DELETE FROM cron WHERE name = 'beheer_geschiedenis'");
+$db->exec("DELETE FROM cron WHERE name = 'geschiedenis'");
 
 haal('home.php');
 
@@ -268,8 +269,7 @@ kop('beheer_geschiedenis: nog een keer draaien overschrijft, verdubbelt niet');
 // Forceer dat de taak weer "aan de beurt" is, en verander ondertussen een
 // cijfer — zo bewijst een gewijzigde rij dat de tweede run echt gedraaid
 // heeft, in plaats van dat de test toevallig al slaagde.
-$db->exec("UPDATE cron SET time = DATE_SUB(NOW(), INTERVAL 2 DAY) WHERE name = 'beheer_geschiedenis'");
-$db->exec("UPDATE bans SET id = id"); // no-op, houdt de intentie leesbaar
+$db->exec("UPDATE cron SET time = DATE_SUB(NOW(), INTERVAL 2 DAY) WHERE name = 'geschiedenis'");
 $db->exec("INSERT INTO bans (ip, login, reden, door) VALUES ('9.9.9.9', 'Speler', 'test', 'Baas')");
 
 haal('home.php');
@@ -308,11 +308,18 @@ In `inc/cron.php`, voeg toe aan de array in `cron_tasks()` (na de
 
 ```php
         // Dagelijkse momentopname voor de trendgrafieken op het
-        // beheerdashboard.
-        'beheer_geschiedenis' => [86400, static function (): void {
+        // beheerdashboard. Kortere naam dan de tabel: `cron`.`name` is
+        // varchar(16), en "beheer_geschiedenis" (20 tekens) werd daar
+        // stilzwijgend afgekapt tot "beheer_geschiede" — met als gevolg dat
+        // cron_claim() nooit meer een rij raakte en de taak nooit liep.
+        'geschiedenis' => [86400, static function (): void {
             beheer_geschiedenis_bijwerken();
         }],
 ```
+
+> **Tijdens de uitvoering ontdekt:** de eerste versie gebruikte
+> `'beheer_geschiedenis'` als taaknaam. Dat werkte niet — zie de uitleg in
+> het commentaar hierboven. Gebruik meteen `'geschiedenis'`.
 
 Voeg de functie zelf toe, na `loterij_uitbetalen()`:
 
