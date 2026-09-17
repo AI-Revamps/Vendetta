@@ -22,13 +22,13 @@ defined('BV_INC') || exit;
 function beheerpaginas(): array
 {
     return [
-        'adm-search.php'   => ['Zoeken',          LEVEL_MODERATOR],
-        'adm-online.php'   => ['Online',          LEVEL_MODERATOR],
-        'adm-prison.php'   => ['Gevangenis',      LEVEL_MODERATOR],
-        'adm-warn.php'     => ['Waarschuwen',     LEVEL_MODERATOR],
+        'search.php'   => ['Zoeken',          LEVEL_MODERATOR, 'Spelers'],
+        'online.php'   => ['Online',          LEVEL_MODERATOR, 'Spelers'],
+        'prison.php'   => ['Gevangenis',      LEVEL_MODERATOR, 'Spelers'],
+        'warn.php'     => ['Waarschuwen',     LEVEL_MODERATOR, 'Spelers'],
         'adm-msg.php'      => ['Bericht sturen',  LEVEL_ADMIN],
-        'adm-ban.php'      => ['Bannen',          LEVEL_ADMIN],
-        'adm-addmulti.php' => ['Multi-accounts',  LEVEL_ADMIN],
+        'ban.php'      => ['Bannen',          LEVEL_ADMIN, 'Spelers'],
+        'addmulti.php' => ['Multi-accounts',  LEVEL_ADMIN, 'Spelers'],
         'adm-shame.php'    => ['Wall of Shame',   LEVEL_ADMIN],
         'adm-forum.php'    => ['Forum opruimen',  LEVEL_ADMIN],
         'adm-addnews.php'  => ['Nieuws',          LEVEL_ADMIN],
@@ -42,7 +42,7 @@ function beheerpaginas(): array
         'adm-premium.php'  => ['Premium',         LEVEL_ADMIN],
         'adm-items.php'    => ['Items',           LEVEL_OWNER],
         'adm-drdrpr.php'   => ['Steden',          LEVEL_OWNER],
-        'adm-bo.php'       => ['Speler bewerken', LEVEL_OWNER],
+        'bo.php'       => ['Speler bewerken', LEVEL_OWNER, 'Spelers'],
     ];
 }
 

@@ -150,16 +150,16 @@ $sessies = ['speler' => $speler, 'mod' => $mod, 'admin' => $admin, 'baas' => $ba
 /** pagina => het laagste niveau dat erbij mag */
 $paginas = [
     'admin/dashboard.php' => 'mod',
-    'adm-online.php'   => 'mod',
-    'adm-warn.php'     => 'mod',
-    'adm-search.php'   => 'mod',
+    'admin/online.php' => 'mod',
+    'admin/warn.php'   => 'mod',
+    'admin/search.php' => 'mod',
     'adm-msg.php'      => 'admin',
-    'adm-ban.php'      => 'admin',
-    'adm-addmulti.php' => 'admin',
+    'admin/ban.php'      => 'admin',
+    'admin/addmulti.php' => 'admin',
     'adm-items.php'    => 'baas',
     'adm-premium.php'  => 'admin',
     'adm-getuigen.php' => 'admin',
-    'adm-bo.php'       => 'baas',
+    'admin/bo.php'       => 'baas',
     'adm-klikmissies.php' => 'admin',
 ];
 
@@ -232,8 +232,8 @@ kop('adm-bo.php: de eigenaar mag iemand tot eigenaar maken, niet hoger');
 $db->exec("UPDATE users SET level = 1 WHERE login = 'Speler'");
 
 $id      = (int) $db->query("SELECT id FROM users WHERE login = 'Speler'")->fetchColumn();
-$tokenBo = tok(haal('adm-bo.php', null, $baas)['body']);
-haal('adm-bo.php', ['_token' => $tokenBo, 'id' => (string) $id, 'level' => '1000'], $baas);
+$tokenBo = tok(haal('admin/bo.php', null, $baas)['body']);
+haal('admin/bo.php', ['_token' => $tokenBo, 'id' => (string) $id, 'level' => '1000'], $baas);
 
 $nieuwLevel = (int) $db->query("SELECT level FROM users WHERE login = 'Speler'")->fetchColumn();
 check('Speler is nu eigenaar (niveau 1000)', $nieuwLevel === 1000, 'niveau ' . $nieuwLevel);
@@ -243,8 +243,8 @@ $db->exec("UPDATE users SET level = 1 WHERE login = 'Speler'");
 // Rechten moeten ook bij een POST gelden, niet alleen bij het tonen.
 kop('rechten gelden ook bij POST');
 
-$h = haal('adm-ban.php', null, $baas)['body'];
-$r = haal('adm-ban.php', ['_token' => tok($h), 'actie' => 'ban', 'soort' => 'login',
+$h = haal('admin/ban.php', null, $baas)['body'];
+$r = haal('admin/ban.php', ['_token' => tok($h), 'actie' => 'ban', 'soort' => 'login',
     'doel' => 'Speler', 'reden' => 'test'], $mod);
 
 $nog = (int) $db->query("SELECT COUNT(*) FROM bans WHERE login='Speler'")->fetchColumn();

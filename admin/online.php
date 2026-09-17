@@ -8,12 +8,12 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
 const ONLINE_MINUTEN = 15;
 
-$user = beheer_start('adm-online.php');
+$user = beheer_start('online.php');
 
 $spelers = q_all(
     'SELECT `login`, `level`, `xp`, `stad`, `famillie`, `status`, `ip`, `online`
@@ -45,7 +45,7 @@ if ($spelers === []) {
 
         echo '<tr>';
         echo '<td><a' . speler_rol_attr((string) $speler['login']) . ' href="'
-           . e(url('adm-search.php?login=' . rawurlencode((string) $speler['login'])))
+           . e(beheer_url('search.php?login=' . rawurlencode((string) $speler['login'])))
            . '">' . e((string) $speler['login']) . '</a>'
            . ($staf ? ' <small>(staf)</small>' : '')
            . ($speler['status'] !== 'levend' ? ' <small>(dood)</small>' : '') . '</td>';
@@ -61,4 +61,4 @@ if ($spelers === []) {
 }
 
 panel_close();
-layout_footer();
+beheer_footer();

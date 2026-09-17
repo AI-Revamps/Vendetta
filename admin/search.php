@@ -19,7 +19,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
 $melding = null;
@@ -27,7 +27,7 @@ $type    = 'info';
 
 // De rechtencontrole gebeurt in beheer_start(), maar POST-acties worden
 // verwerkt voordat er iets getoond wordt.
-$nodig = beheerpaginas()['adm-search.php'][1];
+$nodig = beheerpaginas()['search.php'][1];
 $user  = require_level($nodig);
 
 if (is_post()) {
@@ -42,8 +42,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-search.php');
+beheer_header($user, 'search.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -68,7 +67,7 @@ if ($gezocht !== '') {
 
 toon_zoekformulier();
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 
@@ -280,7 +279,7 @@ function toon_speler(array $user, string $naam): void
 
             $namen = array_map(
                 static fn (array $r): string => '<a' . speler_rol_attr((string) $r['login']) . ' href="'
-                    . e(url('adm-search.php?login=' . rawurlencode((string) $r['login']))) . '">'
+                    . e(beheer_url('search.php?login=' . rawurlencode((string) $r['login']))) . '">'
                     . e((string) $r['login']) . '</a>',
                 $andere
             );
