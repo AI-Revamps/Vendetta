@@ -17,12 +17,12 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
 const ADM_BERICHT_MAX = 5000;
 
-$user    = require_level(beheerpaginas()['adm-msg.php'][1]);
+$user    = require_level(beheerpaginas()['msg.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -37,8 +37,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-msg.php');
+beheer_header($user, 'msg.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -73,7 +72,7 @@ panel_close();
 
 beheer_logregels('beheerbericht');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 

@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 defined('BV_INC') || exit;
 
-// Standaardwaarden. De beheerder kan ze omzetten op adm-premium.php.
+// Standaardwaarden. De beheerder kan ze omzetten op admin/premium.php.
 const DIAMANT_KANS_STANDAARD   = 500;   // één op de zoveel
 const PREMIUM_DAGEN            = 14;
 const PREMIUM_PRIJS_STANDAARD  = 250;   // diamanten

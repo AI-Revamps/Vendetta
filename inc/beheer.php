@@ -12,12 +12,7 @@ defined('BV_INC') || exit;
 
 /**
  * De beheerpagina's: bestand => [label, benodigd niveau, categorie].
- *
- * De categorie ontbreekt bewust bij bestanden die nog niet naar admin/ zijn
- * verplaatst — beheer_categorieen() slaat zulke rijen over, zodat het
- * zijmenu nooit naar een bestand linkt dat nog op zijn oude plek staat.
- * Naarmate elke categorie verhuist krijgt de rij zijn derde element én zijn
- * nieuwe, kale bestandsnaam als sleutel.
+ * Wordt gebruikt voor het zijmenu én voor de rechtencontrole per pagina.
  */
 function beheerpaginas(): array
 {
@@ -26,7 +21,7 @@ function beheerpaginas(): array
         'online.php'   => ['Online',          LEVEL_MODERATOR, 'Spelers'],
         'prison.php'   => ['Gevangenis',      LEVEL_MODERATOR, 'Spelers'],
         'warn.php'     => ['Waarschuwen',     LEVEL_MODERATOR, 'Spelers'],
-        'adm-msg.php'      => ['Bericht sturen',  LEVEL_ADMIN],
+        'msg.php'      => ['Bericht sturen',  LEVEL_ADMIN, 'Communicatie'],
         'ban.php'      => ['Bannen',          LEVEL_ADMIN, 'Spelers'],
         'addmulti.php' => ['Multi-accounts',  LEVEL_ADMIN, 'Spelers'],
         'shame.php'    => ['Wall of Shame',   LEVEL_ADMIN, 'Inhoud'],
@@ -39,7 +34,7 @@ function beheerpaginas(): array
         // balansinstellingen erop blijven daarbinnen apart op eigenaarsniveau
         // afgeschermd, want dat veld gaat ongefilterd bij elke speler in de
         // browser terecht.
-        'adm-premium.php'  => ['Premium',         LEVEL_ADMIN],
+        'premium.php'  => ['Premium',         LEVEL_ADMIN, 'Economie'],
         'items.php'    => ['Items',           LEVEL_OWNER, 'Spelwereld'],
         'drdrpr.php'   => ['Steden',          LEVEL_OWNER, 'Spelwereld'],
         'bo.php'       => ['Speler bewerken', LEVEL_OWNER, 'Spelers'],
@@ -170,28 +165,6 @@ function beheer_start(string $pagina): array
     beheer_header($user, $pagina);
 
     return $user;
-}
-
-/**
- * De oude, platte knoppenrij — gebruikt door de beheerbestanden die nog niet
- * naar admin/ zijn verplaatst. Verdwijnt zodra de laatste daarvan verhuisd
- * is naar beheer_header().
- */
-function beheer_menu(array $user, string $huidig): void
-{
-    echo '<p>';
-    echo '<a class="knop" style="display:inline-block;margin:0 .3rem .3rem 0" href="'
-       . e(beheer_url('dashboard.php')) . '">Overzicht</a>';
-
-    foreach (beheerpaginas() as $bestand => [$label, $nodig]) {
-        if ((int) $user['level'] < $nodig) {
-            continue;
-        }
-        $actief = $bestand === $huidig ? ' knop-nadruk' : '';
-        echo '<a class="knop' . $actief . '" style="display:inline-block;margin:0 .3rem .3rem 0" href="'
-           . e(url($bestand)) . '">' . e($label) . '</a>';
-    }
-    echo '</p>';
 }
 
 /**

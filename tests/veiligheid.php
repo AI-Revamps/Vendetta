@@ -153,11 +153,11 @@ $paginas = [
     'admin/online.php' => 'mod',
     'admin/warn.php'   => 'mod',
     'admin/search.php' => 'mod',
-    'adm-msg.php'      => 'admin',
+    'admin/msg.php'    => 'admin',
     'admin/ban.php'      => 'admin',
     'admin/addmulti.php' => 'admin',
     'admin/items.php'  => 'baas',
-    'adm-premium.php'  => 'admin',
+    'admin/premium.php' => 'admin',
     'admin/getuigen.php' => 'admin',
     'admin/bo.php'       => 'baas',
     'admin/klikmissies.php' => 'admin',
@@ -180,15 +180,15 @@ foreach ($paginas as $pagina => $vanaf) {
         $mag === [] ? 'niemand' : implode(', ', $mag));
 }
 
-// Op adm-premium.php mag een admin de veilige acties, maar niet de
+// Op admin/premium.php mag een admin de veilige acties, maar niet de
 // advertentiecode of de balansinstellingen — die blijven voor de eigenaar,
 // want dat veld gaat ongefilterd naar de browser van elke speler.
-kop('adm-premium.php: admin mag geen advertentiecode of balans aanpassen');
+kop('admin/premium.php: admin mag geen advertentiecode of balans aanpassen');
 
 $db->exec("DELETE FROM instellingen WHERE naam IN ('ads_html', 'premium_prijs')");
 
-$tokenAdmin = tok(haal('adm-premium.php', null, $admin)['body']);
-haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'advertentie',
+$tokenAdmin = tok(haal('admin/premium.php', null, $admin)['body']);
+haal('admin/premium.php', ['_token' => $tokenAdmin, 'actie' => 'advertentie',
     'html' => '<script>alert(1)</script>', 'interval' => '10'], $admin);
 
 $adsHtml = $db->query(
@@ -198,7 +198,7 @@ $adsHtml = $db->query(
 check('admin kan de advertentiecode niet zetten', $adsHtml === false,
     'ads_html: ' . var_export($adsHtml, true));
 
-haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'balans',
+haal('admin/premium.php', ['_token' => $tokenAdmin, 'actie' => 'balans',
     'kans' => '1', 'prijs' => '1', 'kofi' => 'https://voorbeeld.nl'], $admin);
 
 $premiumPrijs = $db->query(
@@ -208,11 +208,11 @@ $premiumPrijs = $db->query(
 check('admin kan de premiumprijs niet zetten', $premiumPrijs === false,
     'premium_prijs: ' . var_export($premiumPrijs, true));
 
-kop('adm-premium.php: admin mag wel rechtstreeks premiumdagen toekennen');
+kop('admin/premium.php: admin mag wel rechtstreeks premiumdagen toekennen');
 
 $db->exec("UPDATE users SET premium_tot = NULL WHERE login = 'Speler'");
 
-haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'dagen',
+haal('admin/premium.php', ['_token' => $tokenAdmin, 'actie' => 'dagen',
     'speler2' => 'Speler', 'dagen' => '7'], $admin);
 
 $premiumTot    = (string) $db->query(
@@ -227,7 +227,7 @@ check('premium van Speler staat nu precies 7 dagen in de toekomst',
 
 $db->exec("UPDATE users SET premium_tot = NULL WHERE login = 'Speler'");
 
-kop('adm-bo.php: de eigenaar mag iemand tot eigenaar maken, niet hoger');
+kop('admin/bo.php: de eigenaar mag iemand tot eigenaar maken, niet hoger');
 
 $db->exec("UPDATE users SET level = 1 WHERE login = 'Speler'");
 
