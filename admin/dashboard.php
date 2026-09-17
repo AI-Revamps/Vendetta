@@ -56,6 +56,71 @@ foreach ([
 echo '</table></div>';
 panel_close();
 
+// --- Verdeling nu: stad en rang ---
+$stadRijen = q_all(
+    "SELECT `stad`, COUNT(*) AS n FROM `users`
+      WHERE `activated` = 1 GROUP BY `stad` ORDER BY n DESC"
+);
+$stadVerdeling = array_combine(
+    array_column($stadRijen, 'stad'),
+    array_map('intval', array_column($stadRijen, 'n'))
+);
+
+$rangVerdeling = [
+    'Speler'    => (int) q_val(
+        'SELECT COUNT(*) FROM `users` WHERE `activated` = 1 AND `level` < ?',
+        [LEVEL_MODERATOR]
+    ),
+    'Moderator' => (int) q_val(
+        'SELECT COUNT(*) FROM `users` WHERE `activated` = 1 AND `level` >= ? AND `level` < ?',
+        [LEVEL_MODERATOR, LEVEL_ADMIN]
+    ),
+    'Admin'     => (int) q_val(
+        'SELECT COUNT(*) FROM `users` WHERE `activated` = 1 AND `level` >= ? AND `level` < ?',
+        [LEVEL_ADMIN, LEVEL_OWNER]
+    ),
+    'Eigenaar'  => (int) q_val(
+        'SELECT COUNT(*) FROM `users` WHERE `activated` = 1 AND `level` >= ?',
+        [LEVEL_OWNER]
+    ),
+];
+
+// --- Trends: de laatste 30 dagen uit de dagelijkse geschiedenis ---
+$geschiedenis = q_all(
+    "SELECT * FROM `beheer_geschiedenis`
+      WHERE `dag` >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+   ORDER BY `dag`"
+);
+
+$grafiekData = [
+    'stad' => $stadVerdeling,
+    'rang' => $rangVerdeling,
+    'trend' => [
+        'dagen'        => array_column($geschiedenis, 'dag'),
+        'spelers'      => array_map('intval', array_column($geschiedenis, 'spelers')),
+        'geld_totaal'  => array_map('intval', array_column($geschiedenis, 'geld_totaal')),
+        'registraties' => array_map('intval', array_column($geschiedenis, 'nieuwe_registraties')),
+    ],
+];
+
+panel_open('Verdeling nu');
+echo '<div class="beheer-grafieken">';
+echo '<div class="beheer-grafiek"><h3>Spelers per stad</h3><canvas id="grafiek-stad"></canvas></div>';
+echo '<div class="beheer-grafiek"><h3>Spelers per rang</h3><canvas id="grafiek-rang"></canvas></div>';
+echo '</div>';
+panel_close();
+
+panel_open('Trends (laatste 30 dagen)');
+echo '<div class="beheer-grafieken">';
+echo '<div class="beheer-grafiek"><h3>Totaal spelers</h3><canvas id="grafiek-spelers"></canvas></div>';
+echo '<div class="beheer-grafiek"><h3>Geld in omloop</h3><canvas id="grafiek-geld"></canvas></div>';
+echo '<div class="beheer-grafiek"><h3>Nieuwe registraties</h3><canvas id="grafiek-registraties"></canvas></div>';
+echo '</div>';
+panel_close();
+
+echo '<script type="application/json" id="beheer-data">'
+   . json_encode($grafiekData, JSON_HEX_TAG | JSON_HEX_AMP) . '</script>' . "\n";
+
 // --- Wat er recent gebeurd is ---
 $recent = q_all('SELECT * FROM `logs` ORDER BY `time` DESC LIMIT 30');
 

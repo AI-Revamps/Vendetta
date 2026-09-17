@@ -423,4 +423,23 @@ check('een gebande moderator toont naam-gebanned, niet naam-moderator',
     str_contains(naamcel($profiel('Mod')), '<span class="naam-gebanned">Mod</span>'));
 $db->exec("DELETE FROM bans WHERE login = 'Mod'");
 
+// --- Deel 6: het datablok van het beheerdashboard ---------------------------
+
+kop('beheerdashboard: het datablok is geldige, veilig-ingesloten JSON');
+
+$dashboard = haal('admin/dashboard.php', null, $baas)['body'];
+
+check('bevat het datablok', str_contains($dashboard, 'id="beheer-data"'));
+
+preg_match('#<script type="application/json" id="beheer-data">(.*?)</script>#s',
+    $dashboard, $m);
+$json = $m[1] ?? '';
+
+check('geen letterlijke </script erin', !str_contains($json, '</script'));
+
+$data = json_decode($json, true);
+check('is geldige JSON', $data !== null, json_last_error_msg());
+check('bevat de drie verwachte sleutels',
+    is_array($data) && isset($data['stad'], $data['rang'], $data['trend']));
+
 samenvatting();
