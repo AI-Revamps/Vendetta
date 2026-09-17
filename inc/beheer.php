@@ -24,6 +24,7 @@ function beheerpaginas(): array
         'msg.php'      => ['Bericht sturen',  LEVEL_ADMIN, 'Communicatie'],
         'ban.php'      => ['Bannen',          LEVEL_ADMIN, 'Spelers'],
         'addmulti.php' => ['Multi-accounts',  LEVEL_ADMIN, 'Spelers'],
+        'garages.php'  => ['Garages',         LEVEL_ADMIN, 'Spelers'],
         'shame.php'    => ['Wall of Shame',   LEVEL_ADMIN, 'Inhoud'],
         'forum.php'    => ['Forum opruimen',  LEVEL_ADMIN, 'Inhoud'],
         'addnews.php'  => ['Nieuws',          LEVEL_ADMIN, 'Inhoud'],
@@ -38,6 +39,7 @@ function beheerpaginas(): array
         'diamanten.php'    => ['Diamanten en prijs', LEVEL_OWNER, 'Economie'],
         'toekennen.php'    => ['Toekennen',         LEVEL_ADMIN, 'Economie'],
         'items.php'    => ['Items',           LEVEL_OWNER, 'Spelwereld'],
+        'autos.php'    => ['Auto\'s',         LEVEL_OWNER, 'Spelwereld'],
         'drdrpr.php'   => ['Steden',          LEVEL_OWNER, 'Spelwereld'],
         'bo.php'       => ['Speler bewerken', LEVEL_OWNER, 'Spelers'],
     ];
