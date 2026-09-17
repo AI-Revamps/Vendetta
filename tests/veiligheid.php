@@ -156,6 +156,7 @@ $paginas = [
     'admin/msg.php'    => 'admin',
     'admin/ban.php'      => 'admin',
     'admin/addmulti.php' => 'admin',
+    'admin/garages.php' => 'admin',
     'admin/items.php'  => 'baas',
     'admin/autos.php'  => 'baas',
     'admin/premiumlog.php'   => 'admin',
@@ -508,5 +509,46 @@ haal('admin/autos.php', ['_token' => $tokenAutos4, 'actie' => 'verwijderen', 'id
 
 $bestaatNog = (int) $db->query("SELECT COUNT(*) FROM cars WHERE id = {$id}")->fetchColumn();
 check('de auto is verwijderd', $bestaatNog === 0, (string) $bestaatNog);
+
+// --- Deel 9: de garage van een speler beheren -------------------------------
+
+kop('admin/garages.php: opzoeken, bewerken, ongeldige stad weigeren, verwijderen');
+
+$db->exec("DELETE FROM garage WHERE login = 'Speler'");
+$db->exec(
+    "INSERT INTO garage (login, naam, waarde, damage, stad, safe)
+     VALUES ('Speler', 'Pontiac', 10000, 20, 'Brussel', 0)"
+);
+$garageId = (int) $db->lastInsertId();
+
+$zoekResultaat = haal('admin/garages.php?login=Speler', null, $admin)['body'];
+check('de auto van Speler staat in de zoekresultaten', str_contains($zoekResultaat, 'Pontiac'));
+
+$tokenGarage = tok($zoekResultaat);
+haal('admin/garages.php', ['_token' => $tokenGarage, 'actie' => 'opslaan', 'id' => (string) $garageId,
+    'naam' => 'Ford Mustang', 'stad' => 'Antwerpen', 'waarde' => '5000', 'damage' => '50'], $admin);
+
+$bijgewerkt = $db->query("SELECT * FROM garage WHERE id = {$garageId}")->fetch();
+check('de auto is bijgewerkt: naam, stad, waarde en schade kloppen',
+    $bijgewerkt !== false && $bijgewerkt['naam'] === 'Ford Mustang'
+        && $bijgewerkt['stad'] === 'Antwerpen' && (int) $bijgewerkt['waarde'] === 5000
+        && (int) $bijgewerkt['damage'] === 50,
+    json_encode($bijgewerkt));
+
+$tokenGarage2 = tok(haal('admin/garages.php?login=Speler', null, $admin)['body']);
+$rOngeldigeStad = haal('admin/garages.php', ['_token' => $tokenGarage2, 'actie' => 'opslaan',
+    'id' => (string) $garageId, 'naam' => 'Ford Mustang', 'stad' => 'Nergenshuizen',
+    'waarde' => '5000', 'damage' => '50'], $admin);
+$naOngeldigeStad = (string) $db->query("SELECT stad FROM garage WHERE id = {$garageId}")->fetchColumn();
+check('een niet-bestaande stad wordt geweigerd',
+    str_contains(melding($rOngeldigeStad['body']), '[fout]') && $naOngeldigeStad === 'Antwerpen',
+    $naOngeldigeStad);
+
+$tokenGarage3 = tok(haal('admin/garages.php?login=Speler', null, $admin)['body']);
+haal('admin/garages.php', ['_token' => $tokenGarage3, 'actie' => 'verwijderen',
+    'id' => (string) $garageId], $admin);
+
+$bestaatGarageNog = (int) $db->query("SELECT COUNT(*) FROM garage WHERE id = {$garageId}")->fetchColumn();
+check('de auto is uit de garage verwijderd', $bestaatGarageNog === 0, (string) $bestaatGarageNog);
 
 samenvatting();

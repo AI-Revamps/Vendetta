@@ -52,13 +52,15 @@ echo '<thead><tr><th>Merk/model</th><th>Naam (in garages)</th><th>Plaatje</th>'
 
 foreach ($autos as $auto) {
     echo '<tr><form method="post" style="display:contents">' . csrf_field()
-       . '<input type="hidden" name="actie" value="opslaan">'
        . '<input type="hidden" name="id" value="' . (int) $auto['id'] . '">';
     echo '<td><input name="auto" value="' . e((string) $auto['auto']) . '" maxlength="64"></td>';
     echo '<td><input name="naam" value="' . e((string) $auto['naam']) . '" maxlength="64"></td>';
     echo '<td><input name="url" value="' . e((string) $auto['url']) . '" maxlength="255" size="24"></td>';
     echo '<td><input name="waarde" value="' . (int) $auto['waarde'] . '" size="10" inputmode="numeric"></td>';
-    echo '<td><button type="submit">Opslaan</button></td>';
+    echo '<td>'
+       . '<button type="submit" name="actie" value="opslaan">Opslaan</button> '
+       . '<button type="submit" name="actie" value="verwijderen">Verwijderen</button>'
+       . '</td>';
     echo '</form></tr>';
 }
 
