@@ -56,6 +56,28 @@ foreach ([
 echo '</table></div>';
 panel_close();
 
+// --- Cron-status ---
+$cronRijen  = q_all('SELECT `name`, `time` FROM `cron`');
+$cronLaatst = array_combine(array_column($cronRijen, 'name'), array_column($cronRijen, 'time'));
+
+panel_open('Cron-status');
+echo '<div class="tabelwikkel"><table class="lijst">';
+echo '<thead><tr><th>Taak</th><th>Laatst gedraaid</th><th>Interval</th><th>Status</th></tr></thead><tbody>';
+foreach (cron_tasks() as $taakNaam => $taakRij) {
+    $interval = $taakRij[0];
+    $laatst   = $cronLaatst[$taakNaam] ?? null;
+    $opTijd   = $laatst !== null && (time() - strtotime($laatst)) < $interval;
+
+    echo '<tr>';
+    echo '<td>' . e($taakNaam) . '</td>';
+    echo '<td>' . ($laatst !== null ? e(datetime_nl($laatst)) : 'nog nooit') . '</td>';
+    echo '<td>' . e(cron_interval_nl($interval)) . '</td>';
+    echo '<td>' . ($opTijd ? 'recent gedraaid' : 'moet nog draaien') . '</td>';
+    echo '</tr>';
+}
+echo '</tbody></table></div>';
+panel_close();
+
 // --- Verdeling nu: stad en rang ---
 $stadRijen = q_all(
     "SELECT `stad`, COUNT(*) AS n FROM `users`
@@ -120,6 +142,33 @@ panel_close();
 
 echo '<script type="application/json" id="beheer-data">'
    . json_encode($grafiekData, JSON_HEX_TAG | JSON_HEX_AMP) . '</script>' . "\n";
+
+// --- Diamantenlog ---
+$diamantLog = q_all(
+    "SELECT * FROM `logs` WHERE `area` = 'diamant' ORDER BY `time` DESC LIMIT 30"
+);
+
+panel_open('Diamanten: laatste mutaties');
+
+if ($diamantLog === []) {
+    echo '<p>Er is nog niets vastgelegd.</p>';
+} else {
+    echo '<div class="tabelwikkel"><table class="lijst">';
+    echo '<thead><tr><th>Wanneer</th><th>Door</th><th>Wie</th>'
+       . '<th class="getal">Aantal</th><th>Waaraan</th></tr></thead><tbody>';
+    foreach ($diamantLog as $regel) {
+        echo '<tr>';
+        echo '<td>' . e(datetime_nl($regel['time'])) . '</td>';
+        echo '<td>' . speler_naam((string) $regel['login']) . '</td>';
+        echo '<td>' . ($regel['person'] !== '' ? speler_naam((string) $regel['person']) : '-') . '</td>';
+        echo '<td class="getal">' . num((int) $regel['code']) . '</td>';
+        echo '<td>' . e((string) $regel['com']) . '</td>';
+        echo '</tr>';
+    }
+    echo '</tbody></table></div>';
+}
+
+panel_close();
 
 // --- Wat er recent gebeurd is ---
 $recent = q_all('SELECT * FROM `logs` ORDER BY `time` DESC LIMIT 30');

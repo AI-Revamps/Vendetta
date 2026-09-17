@@ -357,7 +357,7 @@ function diamanten_geven(array $user, string $naam, int $aantal): string
     notify((string) $speler['login'], 'Diamanten',
         'Je hebt ' . num($aantal) . ' diamanten gekregen van het beheer.');
 
-    log_action((string) $user['login'], 'premium',
+    log_action((string) $user['login'], 'diamant',
         num($aantal) . ' diamanten toegekend', $aantal, (string) $speler['login']);
 
     return $speler['login'] . ' heeft er ' . num($aantal) . ' gekregen.';

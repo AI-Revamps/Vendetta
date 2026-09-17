@@ -354,3 +354,23 @@ function cron_claim(string $naam, int $interval): bool
     }
     return $geclaimd;
 }
+
+/** Interval in woorden, voor de cron-status op het beheerdashboard. */
+function cron_interval_nl(int $seconden): string
+{
+    if ($seconden % 604800 === 0) {
+        $n = $seconden / 604800;
+        return $n . ' week' . ($n === 1 ? '' : 'en');
+    }
+    if ($seconden % 86400 === 0) {
+        $n = $seconden / 86400;
+        return $n . ' dag' . ($n === 1 ? '' : 'en');
+    }
+    if ($seconden % 3600 === 0) {
+        return ($seconden / 3600) . ' uur';
+    }
+    if ($seconden % 60 === 0) {
+        return ($seconden / 60) . ' minuten';
+    }
+    return $seconden . ' seconden';
+}

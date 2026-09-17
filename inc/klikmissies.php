@@ -82,7 +82,9 @@ function klikmissie_belonen(array $missie, string $login, string $methode, strin
             bijschrijven($userId, (int) $missie['beloning_bank'], 'bank');
         }
         if ((int) $missie['beloning_diamanten'] > 0) {
-            diamanten_bijschrijven($userId, (int) $missie['beloning_diamanten']);
+            $aantal = (int) $missie['beloning_diamanten'];
+            diamanten_bijschrijven($userId, $aantal);
+            log_action($login, 'diamant', 'Beloning voor klikmissie ' . $missie['naam'], $aantal);
         }
 
         q(

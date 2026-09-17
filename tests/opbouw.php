@@ -197,6 +197,8 @@ check('geen spelmodus-klasse op body', !str_contains($html, '<body class="spelmo
 check('wel het beheer-zijmenu', str_contains($html, 'id="zijmenu"'));
 check('wel een link terug naar het spel', str_contains($html, 'Terug naar het spel'));
 check('toont wie is ingelogd', str_contains($html, '>Baas<'));
+check('toont de cron-status', str_contains($html, 'Cron-status'));
+check('toont het diamantenlog', str_contains($html, 'Diamanten: laatste mutaties'));
 
 // De blokken hierna verwachten Speler weer als de ambient sessie.
 login('Speler', 'spelerwachtwoord123');
