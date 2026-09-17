@@ -8,6 +8,10 @@ Elke pagina is één PHP-bestand in de hoofdmap. Dat bestand laadt
 `inc/bootstrap.php`, doet zijn werk, en tekent zichzelf met de bouwstenen uit
 `inc/layout.php`. Er is geen router en geen framework.
 
+De beheerpagina's zijn een uitzondering op "alles in de hoofdmap": die staan
+in `admin/`, met hun eigen schil (`beheer_header()`/`beheer_footer()` in
+`inc/beheer.php`) in plaats van de spelerslay-out uit `inc/layout.php`.
+
 Een typische pagina ziet er zo uit:
 
 ```php
