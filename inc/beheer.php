@@ -33,15 +33,15 @@ function beheerpaginas(): array
         'forum.php'    => ['Forum opruimen',  LEVEL_ADMIN, 'Inhoud'],
         'addnews.php'  => ['Nieuws',          LEVEL_ADMIN, 'Inhoud'],
         'poll.php'     => ['Polls',           LEVEL_ADMIN, 'Inhoud'],
-        'adm-getuigen.php' => ['Ooggetuigen',     LEVEL_ADMIN],
-        'adm-klikmissies.php' => ['Klikmissies',  LEVEL_ADMIN],
+        'getuigen.php' => ['Ooggetuigen',     LEVEL_ADMIN, 'Spelwereld'],
+        'klikmissies.php' => ['Klikmissies',  LEVEL_ADMIN, 'Spelwereld'],
         // De pagina zelf mag een admin in; de advertentiecode en de
         // balansinstellingen erop blijven daarbinnen apart op eigenaarsniveau
         // afgeschermd, want dat veld gaat ongefilterd bij elke speler in de
         // browser terecht.
         'adm-premium.php'  => ['Premium',         LEVEL_ADMIN],
-        'adm-items.php'    => ['Items',           LEVEL_OWNER],
-        'adm-drdrpr.php'   => ['Steden',          LEVEL_OWNER],
+        'items.php'    => ['Items',           LEVEL_OWNER, 'Spelwereld'],
+        'drdrpr.php'   => ['Steden',          LEVEL_OWNER, 'Spelwereld'],
         'bo.php'       => ['Speler bewerken', LEVEL_OWNER, 'Spelers'],
     ];
 }

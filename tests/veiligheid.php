@@ -156,11 +156,11 @@ $paginas = [
     'adm-msg.php'      => 'admin',
     'admin/ban.php'      => 'admin',
     'admin/addmulti.php' => 'admin',
-    'adm-items.php'    => 'baas',
+    'admin/items.php'  => 'baas',
     'adm-premium.php'  => 'admin',
-    'adm-getuigen.php' => 'admin',
+    'admin/getuigen.php' => 'admin',
     'admin/bo.php'       => 'baas',
-    'adm-klikmissies.php' => 'admin',
+    'admin/klikmissies.php' => 'admin',
 ];
 
 foreach ($paginas as $pagina => $vanaf) {

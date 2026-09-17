@@ -90,7 +90,7 @@ function weerstand(array $speler, string $stad): float
  * de waarden in `items` zijn dienovereenkomstig herzien.
  *
  * Wil je de balans anders, pas dan de constanten bovenaan dit bestand aan, of
- * de effectwaarden van de wapens via adm-items.php.
+ * de effectwaarden van de wapens via admin/items.php.
  */
 function trefzekerheid(array $speler): float
 {
@@ -286,7 +286,7 @@ function familie_opvolging(string $familie, string $dodeDon): array
 
 /**
  * De manieren waarop ooggetuigen aangewezen kunnen worden. Een beheerder kiest
- * er een op adm-getuigen.php.
+ * er een op admin/getuigen.php.
  */
 function getuigenwijzen(): array
 {
