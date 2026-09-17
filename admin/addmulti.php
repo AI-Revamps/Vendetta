@@ -12,10 +12,10 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
-$user    = require_level(beheerpaginas()['adm-addmulti.php'][1]);
+$user    = require_level(beheerpaginas()['addmulti.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -34,8 +34,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-addmulti.php');
+beheer_header($user, 'addmulti.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -72,7 +71,7 @@ if ($lijst === []) {
 
         $links = array_map(
             static fn (array $r): string => '<a' . speler_rol_attr((string) $r['login']) . ' href="'
-                . e(url('adm-search.php?login=' . rawurlencode((string) $r['login']))) . '">'
+                . e(beheer_url('search.php?login=' . rawurlencode((string) $r['login']))) . '">'
                 . e((string) $r['login']) . '</a>',
             $namen
         );
@@ -92,7 +91,7 @@ if ($lijst === []) {
 }
 
 panel_close();
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 

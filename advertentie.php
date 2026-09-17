@@ -72,7 +72,7 @@ echo '<p>Deze pagina houdt het spel gratis. Met een premiumaccount zie je hem ni
 
 // De code van de beheerder. Bewust niet ge-escaped: het is HTML die hij zelf
 // heeft ingeplakt om zijn advertentienetwerk te laten werken. Alleen de
-// eigenaar kan dit veld vullen; zie adm-premium.php.
+// eigenaar kan dit veld vullen; zie admin/advertenties.php.
 echo '<div class="advertentie">' . ads_html() . '</div>';
 
 echo '<form method="post">' . csrf_field();

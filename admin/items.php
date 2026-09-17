@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
 /** De soorten items en hun betekenis. */
@@ -23,7 +23,7 @@ function itemsoorten(): array
     ];
 }
 
-$user    = require_level(beheerpaginas()['adm-items.php'][1]);
+$user    = require_level(beheerpaginas()['items.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -43,8 +43,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-items.php');
+beheer_header($user, 'items.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -95,7 +94,7 @@ echo '<p class="uitleg">Bij wapens en bescherming is een hoger effect beter: het
    . 'vermenigvuldiger op respectievelijk trefzekerheid en weerstand. Bij vervoer is het '
    . 'effect de reistijd in seconden — daar is lager beter.</p>';
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 

@@ -177,8 +177,8 @@ function kopen_met_diamanten(array $user): string
 
         premium_verlengen((int) $user['id']);
 
-        log_action((string) $user['login'], 'premium',
-            'Afgesloten met ' . $prijs . ' diamanten', $prijs);
+        log_action((string) $user['login'], 'diamant',
+            'Uitgegeven aan premium', $prijs);
 
         return 'Je hebt premium voor ' . PREMIUM_DAGEN . ' dagen. Geen advertenties meer.';
     });

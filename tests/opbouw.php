@@ -55,8 +55,7 @@ check('standaard geen advertentieblok op de voorpagina',
     !str_contains($uit, 'class="advertentie"'));
 
 $baas = login('Baas', 'baaswachtwoord12345');
-doe('adm-premium.php', [
-    'actie'    => 'advertentie',
+doe('admin/advertenties.php', [
     'html'     => '<div id="testadvertentie">Test-advertentie</div>',
     'interval' => '25',
     'outgame'  => '1',
@@ -68,8 +67,7 @@ check('advertentieblok verschijnt als de instelling aanstaat',
         && str_contains($aan, '<div id="testadvertentie">Test-advertentie</div>'));
 
 // Instelling weer uitzetten, anders draait elke volgende pagina met reclame.
-doe('adm-premium.php', [
-    'actie'    => 'advertentie',
+doe('admin/advertenties.php', [
     'html'     => '',
     'interval' => '25',
 ], $baas);
@@ -153,7 +151,6 @@ $verwacht = [
     'fam.php'        => 'Familie',
     'famman.php'     => 'Familie',
     'roulette.php'   => 'Gokken',
-    'adm-search.php' => 'Beheer',
 ];
 
 foreach ($verwacht as $pagina => $groep) {
@@ -184,6 +181,25 @@ foreach ($blokken[0] as $blok) {
 check('hoogstens één groep open', count($blokken[0]) === 1, count($blokken[0]) . ' open');
 check('zichtbare items blijven beperkt', $zichtbaar <= 15, $zichtbaar . ' items');
 check('alle groepen staan er nog', substr_count($html, '<summary>') >= 6);
+
+// --- Beheerschil -------------------------------------------------------
+
+kop('beheerschil: eigen kopbalk en zijmenu, geen spelonderdelen');
+
+$baasJar = login('Baas', 'baaswachtwoord12345');
+$html    = haal('admin/dashboard.php', null, $baasJar)['body'];
+
+check('geen statuspaneel', !str_contains($html, 'class="statuspaneel"'));
+check('geen onderbalk', !str_contains($html, 'class="onderbalk"'));
+check('geen spelmodus-klasse op body', !str_contains($html, '<body class="spelmodus"'));
+check('wel het beheer-zijmenu', str_contains($html, 'id="zijmenu"'));
+check('wel een link terug naar het spel', str_contains($html, 'Terug naar het spel'));
+check('toont wie is ingelogd', str_contains($html, '>Baas<'));
+check('toont de cron-status', str_contains($html, 'Cron-status'));
+check('toont het diamantenlog', str_contains($html, 'Diamanten: laatste mutaties'));
+
+// De blokken hierna verwachten Speler weer als de ambient sessie.
+login('Speler', 'spelerwachtwoord123');
 
 // --- Klikmissies: badge in het menu ------------------------------------------
 

@@ -149,18 +149,22 @@ $sessies = ['speler' => $speler, 'mod' => $mod, 'admin' => $admin, 'baas' => $ba
 
 /** pagina => het laagste niveau dat erbij mag */
 $paginas = [
-    'admin.php'        => 'mod',
-    'adm-online.php'   => 'mod',
-    'adm-warn.php'     => 'mod',
-    'adm-search.php'   => 'mod',
-    'adm-msg.php'      => 'admin',
-    'adm-ban.php'      => 'admin',
-    'adm-addmulti.php' => 'admin',
-    'adm-items.php'    => 'baas',
-    'adm-premium.php'  => 'admin',
-    'adm-getuigen.php' => 'admin',
-    'adm-bo.php'       => 'baas',
-    'adm-klikmissies.php' => 'admin',
+    'admin/dashboard.php' => 'mod',
+    'admin/online.php' => 'mod',
+    'admin/warn.php'   => 'mod',
+    'admin/search.php' => 'mod',
+    'admin/msg.php'    => 'admin',
+    'admin/ban.php'      => 'admin',
+    'admin/addmulti.php' => 'admin',
+    'admin/items.php'  => 'baas',
+    'admin/premiumlog.php'   => 'admin',
+    'admin/premiumstats.php' => 'admin',
+    'admin/advertenties.php' => 'baas',
+    'admin/diamanten.php'    => 'baas',
+    'admin/toekennen.php'    => 'admin',
+    'admin/getuigen.php' => 'admin',
+    'admin/bo.php'       => 'baas',
+    'admin/klikmissies.php' => 'admin',
 ];
 
 foreach ($paginas as $pagina => $vanaf) {
@@ -180,39 +184,35 @@ foreach ($paginas as $pagina => $vanaf) {
         $mag === [] ? 'niemand' : implode(', ', $mag));
 }
 
-// Op adm-premium.php mag een admin de veilige acties, maar niet de
-// advertentiecode of de balansinstellingen — die blijven voor de eigenaar,
-// want dat veld gaat ongefilterd naar de browser van elke speler.
-kop('adm-premium.php: admin mag geen advertentiecode of balans aanpassen');
+// admin/advertenties.php en admin/diamanten.php mogen alleen de eigenaar in
+// — die instellingen gaan ongefilterd naar de browser van elke speler, of
+// sturen de hele economie. Een admin komt de pagina zelf al niet op (zie de
+// rechtentabel hierboven); dit bevestigt dat er dan ook werkelijk niets
+// verandert.
+kop('admin/advertenties.php en admin/diamanten.php: een admin komt er niet in, en er verandert niets');
 
 $db->exec("DELETE FROM instellingen WHERE naam IN ('ads_html', 'premium_prijs')");
 
-$tokenAdmin = tok(haal('adm-premium.php', null, $admin)['body']);
-haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'advertentie',
-    'html' => '<script>alert(1)</script>', 'interval' => '10'], $admin);
+$rAdv = haal('admin/advertenties.php',
+    ['html' => '<script>alert(1)</script>', 'interval' => '10'], $admin);
+$adsHtml = $db->query("SELECT waarde FROM instellingen WHERE naam = 'ads_html'")->fetchColumn();
 
-$adsHtml = $db->query(
-    "SELECT waarde FROM instellingen WHERE naam = 'ads_html'"
-)->fetchColumn();
+check('admin kan de advertentiecode niet zetten', $rAdv['code'] !== 200 && $adsHtml === false,
+    'HTTP ' . $rAdv['code'] . ', ads_html: ' . var_export($adsHtml, true));
 
-check('admin kan de advertentiecode niet zetten', $adsHtml === false,
-    'ads_html: ' . var_export($adsHtml, true));
+$rDia = haal('admin/diamanten.php',
+    ['kans' => '1', 'prijs' => '1', 'kofi' => 'https://voorbeeld.nl'], $admin);
+$premiumPrijs = $db->query("SELECT waarde FROM instellingen WHERE naam = 'premium_prijs'")->fetchColumn();
 
-haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'balans',
-    'kans' => '1', 'prijs' => '1', 'kofi' => 'https://voorbeeld.nl'], $admin);
+check('admin kan de premiumprijs niet zetten', $rDia['code'] !== 200 && $premiumPrijs === false,
+    'HTTP ' . $rDia['code'] . ', premium_prijs: ' . var_export($premiumPrijs, true));
 
-$premiumPrijs = $db->query(
-    "SELECT waarde FROM instellingen WHERE naam = 'premium_prijs'"
-)->fetchColumn();
-
-check('admin kan de premiumprijs niet zetten', $premiumPrijs === false,
-    'premium_prijs: ' . var_export($premiumPrijs, true));
-
-kop('adm-premium.php: admin mag wel rechtstreeks premiumdagen toekennen');
+kop('admin/toekennen.php: admin mag wel rechtstreeks premiumdagen toekennen');
 
 $db->exec("UPDATE users SET premium_tot = NULL WHERE login = 'Speler'");
 
-haal('adm-premium.php', ['_token' => $tokenAdmin, 'actie' => 'dagen',
+$tokenToekennen = tok(haal('admin/toekennen.php', null, $admin)['body']);
+haal('admin/toekennen.php', ['_token' => $tokenToekennen, 'actie' => 'dagen',
     'speler2' => 'Speler', 'dagen' => '7'], $admin);
 
 $premiumTot    = (string) $db->query(
@@ -227,13 +227,13 @@ check('premium van Speler staat nu precies 7 dagen in de toekomst',
 
 $db->exec("UPDATE users SET premium_tot = NULL WHERE login = 'Speler'");
 
-kop('adm-bo.php: de eigenaar mag iemand tot eigenaar maken, niet hoger');
+kop('admin/bo.php: de eigenaar mag iemand tot eigenaar maken, niet hoger');
 
 $db->exec("UPDATE users SET level = 1 WHERE login = 'Speler'");
 
 $id      = (int) $db->query("SELECT id FROM users WHERE login = 'Speler'")->fetchColumn();
-$tokenBo = tok(haal('adm-bo.php', null, $baas)['body']);
-haal('adm-bo.php', ['_token' => $tokenBo, 'id' => (string) $id, 'level' => '1000'], $baas);
+$tokenBo = tok(haal('admin/bo.php', null, $baas)['body']);
+haal('admin/bo.php', ['_token' => $tokenBo, 'id' => (string) $id, 'level' => '1000'], $baas);
 
 $nieuwLevel = (int) $db->query("SELECT level FROM users WHERE login = 'Speler'")->fetchColumn();
 check('Speler is nu eigenaar (niveau 1000)', $nieuwLevel === 1000, 'niveau ' . $nieuwLevel);
@@ -243,8 +243,8 @@ $db->exec("UPDATE users SET level = 1 WHERE login = 'Speler'");
 // Rechten moeten ook bij een POST gelden, niet alleen bij het tonen.
 kop('rechten gelden ook bij POST');
 
-$h = haal('adm-ban.php', null, $baas)['body'];
-$r = haal('adm-ban.php', ['_token' => tok($h), 'actie' => 'ban', 'soort' => 'login',
+$h = haal('admin/ban.php', null, $baas)['body'];
+$r = haal('admin/ban.php', ['_token' => tok($h), 'actie' => 'ban', 'soort' => 'login',
     'doel' => 'Speler', 'reden' => 'test'], $mod);
 
 $nog = (int) $db->query("SELECT COUNT(*) FROM bans WHERE login='Speler'")->fetchColumn();
@@ -278,7 +278,7 @@ kop('elk formulier draagt een token');
 
 $zonderToken = [];
 
-foreach (array_map('basename', glob(BV_WORTEL . '/*.php') ?: []) as $pagina) {
+foreach (alle_paginas() as $pagina) {
     if (in_array($pagina, ['cron.php', 'logout.php'], true)) {
         continue;
     }
@@ -303,7 +303,7 @@ kop('geen handelingen achter een gewone link');
 
 $verdacht = [];
 
-foreach (array_map('basename', glob(BV_WORTEL . '/*.php') ?: []) as $pagina) {
+foreach (alle_paginas() as $pagina) {
     $body = haal($pagina, null, $baas)['body'];
 
     preg_match_all('#href="([^"]*(?:actie|action|verwijder|delete)=[^"]*)"#i',
@@ -422,5 +422,50 @@ $db->exec("INSERT INTO bans (login, reden, door) VALUES ('Mod', 'test', 'Baas')"
 check('een gebande moderator toont naam-gebanned, niet naam-moderator',
     str_contains(naamcel($profiel('Mod')), '<span class="naam-gebanned">Mod</span>'));
 $db->exec("DELETE FROM bans WHERE login = 'Mod'");
+
+// --- Deel 6: het datablok van het beheerdashboard ---------------------------
+
+kop('beheerdashboard: het datablok is geldige, veilig-ingesloten JSON');
+
+$dashboard = haal('admin/dashboard.php', null, $baas)['body'];
+
+check('bevat het datablok', str_contains($dashboard, 'id="beheer-data"'));
+
+preg_match('#<script type="application/json" id="beheer-data">(.*?)</script>#s',
+    $dashboard, $m);
+$json = $m[1] ?? '';
+
+check('geen letterlijke </script erin', !str_contains($json, '</script'));
+
+$data = json_decode($json, true);
+check('is geldige JSON', $data !== null, json_last_error_msg());
+check('bevat de drie verwachte sleutels',
+    is_array($data) && isset($data['stad'], $data['rang'], $data['trend']));
+
+// --- Deel 7: een crontaak handmatig forceren, alleen de eigenaar mag dat ----
+
+kop('cron nu draaien: alleen de eigenaar mag een taak forceren');
+
+$db->exec("UPDATE stad SET kogels = 5 WHERE stad = 'Brussel'");
+$db->exec("UPDATE cron SET time = NOW() WHERE name = 'kogels'");
+
+$tokenMod = tok(haal('admin/dashboard.php', null, $mod)['body']);
+$rMod = haal('admin/dashboard.php', ['_token' => $tokenMod, 'taak' => 'kogels'], $mod);
+
+$kogelsNaMod = (int) $db->query("SELECT kogels FROM stad WHERE stad = 'Brussel'")->fetchColumn();
+check('moderator kan geen taak forceren', $rMod['code'] !== 200 && $kogelsNaMod === 5,
+    'HTTP ' . $rMod['code'] . ', kogels ' . $kogelsNaMod);
+
+$tokenBaas = tok(haal('admin/dashboard.php', null, $baas)['body']);
+haal('admin/dashboard.php', ['_token' => $tokenBaas, 'taak' => 'kogels'], $baas);
+
+$kogelsNaBaas = (int) $db->query("SELECT kogels FROM stad WHERE stad = 'Brussel'")->fetchColumn();
+$cronTijd = (int) $db->query(
+    "SELECT UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(time) FROM cron WHERE name = 'kogels'"
+)->fetchColumn();
+
+check('eigenaar kan de taak forceren, ook als hij nog niet aan de beurt was',
+    $kogelsNaBaas === 100, 'kogels ' . $kogelsNaBaas);
+check('de crontijd is zojuist bijgewerkt', $cronTijd < 5, $cronTijd . ' seconden geleden');
 
 samenvatting();

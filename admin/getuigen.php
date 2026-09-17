@@ -10,11 +10,11 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 require BV_INC . '/combat.php';
 
-$user    = require_level(beheerpaginas()['adm-getuigen.php'][1]);
+$user    = require_level(beheerpaginas()['getuigen.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -29,8 +29,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-getuigen.php');
+beheer_header($user, 'getuigen.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -167,7 +166,7 @@ panel_close();
 
 beheer_logregels('getuigen');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 

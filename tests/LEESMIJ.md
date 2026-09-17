@@ -51,11 +51,12 @@ Allemaal in Brussel, met een huis, 100.000 op zak en 50.000 op de bank.
 | `veiligheid.php` | XSS, rechten per niveau, CSRF op elk formulier |
 | `opbouw.php` | de indeling per toestand: uitgelogd, ingelogd, dood; menu en onderbalk |
 | `adressen.php` | adressen zonder `.php`, en of geen enkele link er nog een bevat |
+| `beheergeschiedenis.php` | de dagelijkse cron-taak schrijft precies één rij per dag, met kloppende cijfers |
 
 Elk script geeft exitcode 0 als alles goed ging en 1 als er iets misging, dus:
 
 ```bash
-for t in rook geld veiligheid opbouw adressen; do php tests/$t.php || break; done
+for t in rook geld veiligheid opbouw adressen beheergeschiedenis; do php tests/$t.php || break; done
 ```
 
 `geld.php` en `adressen.php` regelen hun eigen omgeving: de eerste maakt een

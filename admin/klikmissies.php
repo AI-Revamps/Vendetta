@@ -6,11 +6,11 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 require BV_INC . '/klikmissies.php';
 
-$user    = require_level(beheerpaginas()['adm-klikmissies.php'][1]);
+$user    = require_level(beheerpaginas()['klikmissies.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -31,8 +31,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-klikmissies.php');
+beheer_header($user, 'klikmissies.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -44,7 +43,7 @@ toon_lijst();
 
 beheer_logregels('klikmissies');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 
@@ -296,7 +295,7 @@ function toon_lijst(): void
         if ((int) $missie['beloning_diamanten'] > 0) { $beloningen[] = num((int) $missie['beloning_diamanten']) . ' diamanten'; }
 
         echo '<tr>';
-        echo '<td><a href="' . e(url('adm-klikmissies.php?bewerk=' . $id)) . '">'
+        echo '<td><a href="' . e(beheer_url('klikmissies.php?bewerk=' . $id)) . '">'
            . e((string) $missie['naam']) . '</a></td>';
         echo '<td>' . ((int) $missie['heeft_callback'] === 1 ? 'ja' : 'nee') . '</td>';
         echo '<td>' . ((int) $missie['nieuw_venster'] === 1 ? 'nieuw' : 'zelfde') . '</td>';

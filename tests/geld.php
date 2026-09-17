@@ -405,6 +405,13 @@ check('zak precies 5.000 hoger', (int) $u['zak'] === 5000, 'zak ' . $u['zak']);
 check('bank precies 2.000 hoger', (int) $u['bank'] === 2000, 'bank ' . $u['bank']);
 check('diamanten precies 3 hoger', (int) $u['diamanten'] === 3, 'diamanten ' . $u['diamanten']);
 
+$diamantLogregel = $db->query(
+    "SELECT * FROM logs WHERE area = 'diamant' AND login = 'Speler' ORDER BY id DESC LIMIT 1"
+)->fetch();
+check('de diamantbeloning staat in het diamantenlog',
+    $diamantLogregel !== false && (int) $diamantLogregel['code'] === 3,
+    $diamantLogregel === false ? '(geen regel)' : json_encode($diamantLogregel));
+
 $aantalLog = (int) $db->query(
     "SELECT COUNT(*) FROM klikmissies_log
       WHERE klikmissie_id={$missieId} AND login='Speler' AND methode='callback'"

@@ -82,6 +82,7 @@ php tests/geld.php        # de geldbalans klopt
 php tests/veiligheid.php  # XSS, rechten, CSRF
 php tests/opbouw.php      # de indeling per toestand
 php tests/adressen.php    # adressen zonder .php
+php tests/beheergeschiedenis.php  # de dagelijkse geschiedenis klopt
 ```
 
 Ze hebben een draaiende server en database nodig; zie

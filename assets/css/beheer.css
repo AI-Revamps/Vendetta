@@ -1,0 +1,65 @@
+/* Black Vendetta - beheerdashboard.
+   Kleuren en lettertype komen uit style.css (:root); dit bestand voegt
+   alleen de dashboard-specifieke indeling toe: geen derde kolom (geen
+   statuspaneel in beheer), kaarten voor kerncijfers, vakken voor
+   grafieken. */
+
+/* Boven 1100px tekent style.css .layout met drie kolommen (sidebar, inhoud,
+   statuspaneel). Beheer heeft geen statuspaneel, dus twee kolommen — maar
+   alleen op dit brede scherm: de tablet- en telefoonregels in style.css
+   voor .layout blijven verder ongemoeid. */
+@media (min-width: 1101px) {
+    .beheer-layout { grid-template-columns: 200px minmax(0, 1fr); }
+}
+
+.beheer-overzicht {
+    display: block;
+    margin-bottom: .75rem;
+    text-align: center;
+}
+
+.beheer-wie {
+    color: var(--tekst-dof);
+    margin: 0 .75rem;
+}
+
+.beheer-kaarten {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.beheer-kaart {
+    background: var(--paneel-op);
+    border: 1px solid var(--rand);
+    border-radius: var(--radius);
+    padding: .9rem 1rem;
+}
+
+.beheer-kaart .cijfer {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--accent-fel);
+}
+
+.beheer-kaart .label {
+    color: var(--tekst-dof);
+    font-size: .85rem;
+}
+
+.beheer-grafieken {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.beheer-grafiek {
+    background: var(--paneel-op);
+    border: 1px solid var(--rand);
+    border-radius: var(--radius);
+    padding: 1rem;
+}
+
+.beheer-grafiek h3 { margin-top: 0; }

@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 require BV_INC . '/opmaak.php';
 
@@ -25,7 +25,7 @@ const PER_PAGINA  = 10;
 const TITEL_MAX   = 120;
 const TEKST_MAX   = 10000;
 
-$user    = require_level(beheerpaginas()['adm-addnews.php'][1]);
+$user    = require_level(beheerpaginas()['addnews.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -45,8 +45,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-addnews.php');
+beheer_header($user, 'addnews.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -64,7 +63,7 @@ toon_lijst(int_input('p', 0, 0));
 
 beheer_logregels('nieuws');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 
@@ -171,7 +170,7 @@ function toon_bewerken(int $id): void
 
     panel_open('Bericht ' . $id . ' bewerken');
     formulier('opslaan', $id, (string) $bericht['title'], (string) $bericht['text'], 'Opslaan');
-    echo '<p><a href="' . e(url('adm-addnews.php')) . '">Annuleren</a></p>';
+    echo '<p><a href="' . e(beheer_url('addnews.php')) . '">Annuleren</a></p>';
     panel_close();
 }
 
@@ -220,7 +219,7 @@ function toon_lijst(int $pagina): void
         echo '<h3>' . e((string) $rij['title']) . '</h3>';
         echo '<p class="klein">' . e(timestamp_nl((int) $rij['time'])) . '</p>';
         echo '<div>' . bericht_html((string) $rij['text']) . '</div>';
-        echo '<div class="knoppenrij"><a href="' . e(url('adm-addnews.php?bewerk=' . (int) $rij['id'])) . '">Bewerken</a> '
+        echo '<div class="knoppenrij"><a href="' . e(beheer_url('addnews.php?bewerk=' . (int) $rij['id'])) . '">Bewerken</a> '
            . '<form method="post" style="display:inline;margin:0">' . csrf_field()
            . '<input type="hidden" name="actie" value="verwijderen">'
            . '<input type="hidden" name="id" value="' . (int) $rij['id'] . '">'
@@ -235,7 +234,7 @@ function toon_lijst(int $pagina): void
         for ($i = 0; $i < $paginas; $i++) {
             echo $i === $pagina
                 ? '<strong>' . ($i + 1) . '</strong> '
-                : '<a href="' . e(url('adm-addnews.php?p=' . $i)) . '">' . ($i + 1) . '</a> ';
+                : '<a href="' . e(beheer_url('addnews.php?p=' . $i)) . '">' . ($i + 1) . '</a> ';
         }
         echo '</p>';
     }

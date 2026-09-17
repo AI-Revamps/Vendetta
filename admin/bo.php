@@ -19,7 +19,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
 /** De rechtenniveaus met hun naam, van laag naar hoog. */
@@ -69,7 +69,7 @@ function bewerkbare_velden(): array
     ];
 }
 
-$user    = require_level(beheerpaginas()['adm-bo.php'][1]);
+$user    = require_level(beheerpaginas()['bo.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -84,8 +84,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-bo.php');
+beheer_header($user, 'bo.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -116,7 +115,7 @@ if ($gezocht !== '') {
 
 beheer_logregels('spelerbewerking', 30);
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 

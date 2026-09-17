@@ -9,10 +9,10 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
-$user    = require_level(beheerpaginas()['adm-prison.php'][1]);
+$user    = require_level(beheerpaginas()['prison.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -31,8 +31,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-prison.php');
+beheer_header($user, 'prison.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -70,7 +69,7 @@ if ($cellen === []) {
 
         echo '<tr>';
         echo '<td><a' . speler_rol_attr((string) $cel['login']) . ' href="'
-           . e(url('adm-search.php?login=' . rawurlencode((string) $cel['login'])))
+           . e(beheer_url('search.php?login=' . rawurlencode((string) $cel['login'])))
            . '">' . e((string) $cel['login']) . '</a></td>';
         echo '<td>' . e((string) $cel['stad']) . '</td>';
         echo '<td class="getal">' . money((int) $cel['boete']) . '</td>';
@@ -89,7 +88,7 @@ panel_close();
 
 beheer_logregels('gevangenis');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 

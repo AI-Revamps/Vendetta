@@ -15,7 +15,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
 /** De standaardteksten waar een beheerder uit kan kiezen. */
@@ -33,7 +33,7 @@ function waarschuwingen(): array
     ];
 }
 
-$user    = require_level(beheerpaginas()['adm-warn.php'][1]);
+$user    = require_level(beheerpaginas()['warn.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -48,8 +48,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-warn.php');
+beheer_header($user, 'warn.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -77,7 +76,7 @@ panel_close();
 
 beheer_logregels('waarschuwing');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 

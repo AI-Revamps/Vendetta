@@ -10,10 +10,10 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
-$user    = require_level(beheerpaginas()['adm-ban.php'][1]);
+$user    = require_level(beheerpaginas()['ban.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -32,8 +32,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-ban.php');
+beheer_header($user, 'ban.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -79,7 +78,7 @@ if ($bans === []) {
 }
 
 panel_close();
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 
