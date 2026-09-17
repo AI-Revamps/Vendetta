@@ -20,13 +20,13 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 
 /** Zoveel keuzes kent de polltabel. */
 const MAX_KEUZES = 10;
 
-$user    = require_level(beheerpaginas()['adm-poll.php'][1]);
+$user    = require_level(beheerpaginas()['poll.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -47,8 +47,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-poll.php');
+beheer_header($user, 'poll.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -65,7 +64,7 @@ toon_lijst();
 
 beheer_logregels('poll');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 
@@ -212,7 +211,7 @@ function toon_lijst(): void
 
         echo '<tr>';
         echo '<td class="getal">' . $id . '</td>';
-        echo '<td><a href="' . e(url('adm-poll.php?poll=' . $id)) . '">'
+        echo '<td><a href="' . e(beheer_url('poll.php?poll=' . $id)) . '">'
            . e((string) $poll['vraag']) . '</a></td>';
         echo '<td>' . e(timestamp_nl((int) $poll['datum'], false)) . '</td>';
         echo '<td class="getal">' . num($stemmen) . '</td>';
@@ -275,7 +274,7 @@ function toon_uitslag(int $id): void
         echo '<p>Totaal ' . num($totaal) . ' ' . ($totaal === 1 ? 'stem' : 'stemmen') . '.</p>';
     }
 
-    echo '<p><a href="' . e(url('adm-poll.php')) . '">&larr; Terug</a></p>';
+    echo '<p><a href="' . e(beheer_url('poll.php')) . '">&larr; Terug</a></p>';
     panel_close();
 }
 

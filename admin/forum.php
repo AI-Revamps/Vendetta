@@ -19,13 +19,13 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/inc/bootstrap.php';
+require __DIR__ . '/../inc/bootstrap.php';
 require BV_INC . '/beheer.php';
 require BV_INC . '/opmaak.php';
 
 const PER_PAGINA = 25;
 
-$user    = require_level(beheerpaginas()['adm-forum.php'][1]);
+$user    = require_level(beheerpaginas()['forum.php'][1]);
 $melding = null;
 $type    = 'info';
 
@@ -44,8 +44,7 @@ if (is_post()) {
     }
 }
 
-layout_header('Beheer');
-beheer_menu($user, 'adm-forum.php');
+beheer_header($user, 'forum.php');
 
 if ($melding !== null) {
     notice(e($melding), $type);
@@ -62,7 +61,7 @@ if ($topicId > 0) {
 
 beheer_logregels('forum');
 
-layout_footer();
+beheer_footer();
 
 // ==========================================================================
 
@@ -128,9 +127,9 @@ function toon_topics(string $categorie, int $pagina): void
 
     panel_open('Categorie kiezen');
     echo '<p>';
-    echo '<a href="' . e(url('adm-forum.php')) . '">Alles</a>';
+    echo '<a href="' . e(beheer_url('forum.php')) . '">Alles</a>';
     foreach (forum_categorieen() as $sleutel => $naam) {
-        echo ' &middot; <a href="' . e(url('adm-forum.php?type=' . rawurlencode($sleutel))) . '">'
+        echo ' &middot; <a href="' . e(beheer_url('forum.php?type=' . rawurlencode($sleutel))) . '">'
            . e($naam) . '</a>';
     }
     echo '</p>';
@@ -148,7 +147,7 @@ function toon_topics(string $categorie, int $pagina): void
         foreach ($rijen as $rij) {
             echo '<tr>';
             echo '<td class="getal">' . (int) $rij['id'] . '</td>';
-            echo '<td><a href="' . e(url('adm-forum.php?topic=' . (int) $rij['id'])) . '">'
+            echo '<td><a href="' . e(beheer_url('forum.php?topic=' . (int) $rij['id'])) . '">'
                . e((string) $rij['subject']) . '</a></td>';
             echo '<td>' . e(forum_categorieen()[$rij['type']] ?? (string) $rij['type']) . '</td>';
             echo '<td>' . speler_naam((string) $rij['user']) . '</td>';
@@ -177,7 +176,7 @@ function toon_topic(int $id): void
     }
 
     panel_open('Topic ' . $id . ': ' . $topic['subject']);
-    echo '<p><a href="' . e(url('adm-forum.php?type=' . rawurlencode((string) $topic['type'])))
+    echo '<p><a href="' . e(beheer_url('forum.php?type=' . rawurlencode((string) $topic['type'])))
        . '">&larr; Terug naar de lijst</a></p>';
     echo '<p><strong>' . speler_naam((string) $topic['user']) . '</strong> &middot; '
        . e(datetime_nl($topic['date'])) . '</p>';
@@ -224,13 +223,13 @@ function paginabalk(string $categorie, int $pagina, int $totaal): void
         return;
     }
 
-    $basis = 'adm-forum.php?' . ($categorie !== '' ? 'type=' . rawurlencode($categorie) . '&' : '');
+    $basis = 'forum.php?' . ($categorie !== '' ? 'type=' . rawurlencode($categorie) . '&' : '');
 
     echo '<p class="paginering">';
     for ($i = 0; $i < $paginas; $i++) {
         echo $i === $pagina
             ? '<strong>' . ($i + 1) . '</strong> '
-            : '<a href="' . e(url($basis . 'p=' . $i)) . '">' . ($i + 1) . '</a> ';
+            : '<a href="' . e(beheer_url($basis . 'p=' . $i)) . '">' . ($i + 1) . '</a> ';
     }
     echo '</p>';
 }

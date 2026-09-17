@@ -628,7 +628,7 @@ function huis_afnemen(string $login, string $stad): bool
 
 /**
  * De vaste forumcategorieën. Alleen deze sleutels komen in de database.
- * Staat hier omdat zowel forum.php als adm-forum.php ze nodig heeft.
+ * Staat hier omdat zowel forum.php als admin/forum.php ze nodig heeft.
  */
 function forum_categorieen(): array
 {
