@@ -95,14 +95,12 @@ panel_open('Rangen', 'rangen');
 echo '<p>Je rang hangt af van je ervaring. Er zijn er ' . count(rank_ladder()) . '.</p>';
 
 echo '<div class="tabelwikkel"><table class="lijst">';
-echo '<thead><tr><th>Rang</th><th>Vrouwelijke vorm</th><th class="getal">Vanaf ervaring</th>'
-   . '</tr></thead><tbody>';
+echo '<thead><tr><th>Rang</th><th>Vrouwelijke vorm</th></tr></thead><tbody>';
 
 foreach (rank_ladder() as $stap) {
     echo '<tr>';
     echo '<td>' . e($stap[1]) . '</td>';
     echo '<td>' . ($stap[2] !== null ? e($stap[2]) : '<span class="uit">—</span>') . '</td>';
-    echo '<td class="getal">' . num($stap[0]) . '</td>';
     echo '</tr>';
 }
 
