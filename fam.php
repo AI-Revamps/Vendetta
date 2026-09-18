@@ -277,9 +277,7 @@ function toon_oprichten(array $user): void
     if (($user['famillie'] ?? '') !== '') {
         echo '<p>Je zit al in een familie.</p>';
     } elseif ((int) $user['xp'] < FAM_OPRICHT_XP) {
-        $percentage = (int) min(100, floor((int) $user['xp'] / FAM_OPRICHT_XP * 100));
-        echo '<p>Je moet minstens de rang Local Chief hebben. Je bent op '
-           . $percentage . '% van de ervaring die je daarvoor nodig hebt.</p>';
+        echo '<p>Je moet minstens de rang Local Chief hebben.</p>';
     } else {
         echo '<p>Een familie stichten kost ' . money(FAM_OPRICHTKOSTEN)
            . '. Je hebt ' . money((int) $user['zak']) . ' op zak.</p>';

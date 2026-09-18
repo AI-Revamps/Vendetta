@@ -358,9 +358,7 @@ function toon_nieuw(array $user): void
     panel_open('Trouwen');
 
     if ((int) $user['xp'] < HUWELIJK_XP) {
-        $percentage = (int) min(100, floor((int) $user['xp'] / HUWELIJK_XP * 100));
-        echo '<p>Je moet minstens de rang Thief hebben om te trouwen. Je bent op '
-           . $percentage . '% van de ervaring die je daarvoor nodig hebt.</p>';
+        echo '<p>Je moet minstens de rang Thief hebben om te trouwen.</p>';
         panel_close();
         return;
     }
