@@ -204,7 +204,7 @@ function welstand(int $zak): string
 function beschikbaar(int $klaarOp, int $xp, int $nodig): string
 {
     if ($xp < $nodig) {
-        return 'nee (vanaf ' . num($nodig) . ' ervaring)';
+        return 'nee (vanaf rang ' . rank_name($nodig) . ')';
     }
 
     return $klaarOp > time() ? 'nee (afkoeltijd loopt)' : 'ja';

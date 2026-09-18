@@ -77,7 +77,7 @@ function fam_aantal_leden(string $naam): int
 function fam_leden(string $naam): array
 {
     return q_all(
-        "SELECT `id`, `login`, `famrang`, `xp`, `stad`, `status`, `online`
+        "SELECT `id`, `login`, `famrang`, `xp`, `geslacht`, `stad`, `status`, `online`
            FROM `users` WHERE `famillie` = ?
        ORDER BY `famrang` DESC, `xp` DESC",
         [$naam]

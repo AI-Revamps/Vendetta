@@ -64,8 +64,7 @@ if ($melding !== null) {
 panel_open('Route 66');
 
 if ((int) $user['xp'] < R66_MIN_XP) {
-    echo '<p>Je moet minstens de rang Pickpocket hebben (' . num(R66_MIN_XP)
-       . ' ervaringspunten) voor een Route 66.</p>';
+    echo '<p>Je moet minstens de rang Pickpocket hebben voor een Route 66.</p>';
 } elseif ($rust > 0 && $route === null) {
     echo '<p>Je bent nog aan het uitrusten. Nog <strong data-tot="' . (time() + $rust) . '">'
        . e(duration($rust)) . '</strong>.</p>';

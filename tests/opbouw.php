@@ -327,4 +327,26 @@ foreach ([100 => 'vol', 40 => 'middel', 10 => 'laag'] as $hp => $klasse) {
 
 $db->exec("UPDATE users SET health=100 WHERE login='Speler'");
 
+// --- Ervaring blijft op de achtergrond --------------------------------------
+
+kop('ervaring wordt nergens als kaal getal aan spelers getoond');
+
+$db->exec("UPDATE users SET xp = 3500 WHERE login = 'Speler'"); // 3500 xp = rang Soldier
+
+$statusHtml = haal('home.php')['body'];
+check('statuspagina toont geen aparte Ervaring-rij', !str_contains($statusHtml, '>Ervaring<'));
+check('statuspagina toont wel de rang', str_contains($statusHtml, 'Soldier'));
+
+$db->exec("UPDATE users SET xp = 0 WHERE login = 'Speler'");
+
+$raceHtml = haal('carrace.php')['body'];
+check('racepagina noemt geen aantal ervaringspunten', !str_contains($raceHtml, 'ervaringspunten'));
+check('racepagina noemt wel de vereiste rang', str_contains($raceHtml, 'Pickpocket'));
+
+$hitlistHtml = haal('hitlist.php')['body'];
+check('premielijst toont rangen, geen kale ervaringsgetallen',
+    str_contains($hitlistHtml, 'Godfather') && !str_contains($hitlistHtml, '20.000 en hoger'));
+
+$db->exec("UPDATE users SET xp = 5000 WHERE login = 'Speler'");
+
 samenvatting();

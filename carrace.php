@@ -64,8 +64,7 @@ if ($melding !== null) {
 panel_open('Autorace');
 
 if ((int) $user['xp'] < RACE_MIN_XP) {
-    echo '<p>Je moet minstens de rang Pickpocket hebben (' . num(RACE_MIN_XP)
-       . ' ervaringspunten) om te racen.</p>';
+    echo '<p>Je moet minstens de rang Pickpocket hebben om te racen.</p>';
 } elseif ($race === null) {
     toon_uitdaging($user);
 } else {

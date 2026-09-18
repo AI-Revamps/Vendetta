@@ -179,15 +179,15 @@ function toon_lijst(array $user): void
         echo '<p>Er zijn nog geen families.</p>';
     } else {
         echo '<div class="tabelwikkel"><table class="lijst">';
-        echo '<thead><tr><th>Familie</th><th>Stad</th><th class="getal">Leden</th>'
-           . '<th class="getal">Ervaring</th></tr></thead><tbody>';
-        foreach ($families as $familie) {
+        echo '<thead><tr><th class="getal">Positie</th><th>Familie</th><th>Stad</th>'
+           . '<th class="getal">Leden</th></tr></thead><tbody>';
+        foreach ($families as $positie => $familie) {
             echo '<tr>';
+            echo '<td class="getal">' . num($positie + 1) . '</td>';
             echo '<td><a href="' . e(url('fam.php?x=' . rawurlencode((string) $familie['name']))) . '">'
                . e((string) $familie['name']) . '</a></td>';
             echo '<td>' . e((string) $familie['stad']) . '</td>';
             echo '<td class="getal">' . num((int) $familie['leden']) . '</td>';
-            echo '<td class="getal">' . num((int) $familie['ervaring']) . '</td>';
             echo '</tr>';
         }
         echo '</tbody></table></div>';
@@ -245,7 +245,7 @@ function toon_familie(array $user, string $naam): void
     // --- Leden ---
     panel_open('Leden');
     echo '<div class="tabelwikkel"><table class="lijst">';
-    echo '<thead><tr><th>Speler</th><th>Rang</th><th class="getal">Ervaring</th><th>Stad</th></tr></thead><tbody>';
+    echo '<thead><tr><th>Speler</th><th>Rang</th><th>Spelrang</th><th>Stad</th></tr></thead><tbody>';
     foreach ($leden as $lid) {
         $dood = $lid['status'] !== 'levend';
         echo '<tr>';
@@ -253,7 +253,7 @@ function toon_familie(array $user, string $naam): void
            . e(url('user.php?x=' . rawurlencode((string) $lid['login']))) . '">'
            . e((string) $lid['login']) . '</a>' . ($dood ? ' <small>(dood)</small>' : '') . '</td>';
         echo '<td>' . e(fam_rangnaam((int) $lid['famrang'])) . '</td>';
-        echo '<td class="getal">' . num((int) $lid['xp']) . '</td>';
+        echo '<td>' . e(rank_name((int) $lid['xp'], (string) $lid['geslacht'])) . '</td>';
         echo '<td>' . e((string) $lid['stad']) . '</td>';
         echo '</tr>';
     }
@@ -277,8 +277,9 @@ function toon_oprichten(array $user): void
     if (($user['famillie'] ?? '') !== '') {
         echo '<p>Je zit al in een familie.</p>';
     } elseif ((int) $user['xp'] < FAM_OPRICHT_XP) {
-        echo '<p>Je moet minstens de rang Local Chief hebben. Je hebt nu '
-           . num((int) $user['xp']) . ' van de ' . num(FAM_OPRICHT_XP) . ' ervaringspunten.</p>';
+        $percentage = (int) min(100, floor((int) $user['xp'] / FAM_OPRICHT_XP * 100));
+        echo '<p>Je moet minstens de rang Local Chief hebben. Je bent op '
+           . $percentage . '% van de ervaring die je daarvoor nodig hebt.</p>';
     } else {
         echo '<p>Een familie stichten kost ' . money(FAM_OPRICHTKOSTEN)
            . '. Je hebt ' . money((int) $user['zak']) . ' op zak.</p>';

@@ -494,7 +494,7 @@ function toon_leden(array $user, array $familie): void
 
     panel_open('Leden van ' . $familie['name']);
     echo '<div class="tabelwikkel"><table class="lijst">';
-    echo '<thead><tr><th>Speler</th><th>Rang</th><th class="getal">Ervaring</th>'
+    echo '<thead><tr><th>Speler</th><th>Rang</th><th>Spelrang</th>'
        . '<th>Wijzigen</th></tr></thead><tbody>';
 
     foreach (fam_leden((string) $familie['name']) as $lid) {
@@ -504,7 +504,7 @@ function toon_leden(array $user, array $familie): void
         echo '<tr>';
         echo '<td>' . speler_naam((string) $lid['login']) . '</td>';
         echo '<td>' . e(fam_rangnaam((int) $lid['famrang'])) . '</td>';
-        echo '<td class="getal">' . num((int) $lid['xp']) . '</td>';
+        echo '<td>' . e(rank_name((int) $lid['xp'], (string) $lid['geslacht'])) . '</td>';
         echo '<td>';
 
         if ($eigen || $hoger) {

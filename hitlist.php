@@ -111,10 +111,14 @@ echo '</div></form>';
 
 echo '<h3>Minimale premie per rang</h3>';
 echo '<div class="tabelwikkel"><table class="lijst">';
-echo '<thead><tr><th>Ervaring</th><th class="getal">Minimale premie</th></tr></thead><tbody>';
+echo '<thead><tr><th>Rang</th><th class="getal">Minimale premie</th></tr></thead><tbody>';
+$vorigeGrens = 0;
 foreach (premie_tabel() as [$maxXp, $bedrag]) {
-    $label = $maxXp === PHP_INT_MAX ? '20.000 en hoger' : 'tot ' . num($maxXp);
-    echo '<tr><td>' . e($label) . '</td><td class="getal">' . money($bedrag) . '</td></tr>';
+    $label = $maxXp === PHP_INT_MAX
+        ? 'vanaf ' . e(rank_name($vorigeGrens))
+        : 'tot en met ' . e(rank_name($maxXp - 1));
+    echo '<tr><td>' . $label . '</td><td class="getal">' . money($bedrag) . '</td></tr>';
+    $vorigeGrens = $maxXp;
 }
 echo '</tbody></table></div>';
 

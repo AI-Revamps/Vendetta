@@ -86,8 +86,7 @@ if ($melding !== null) {
 panel_open('Organised Crime');
 
 if ((int) $user['xp'] < OC_MIN_XP) {
-    echo '<p>Je moet minstens de rang Thief hebben (' . num(OC_MIN_XP)
-       . ' ervaringspunten) om aan een Organised Crime mee te doen.</p>';
+    echo '<p>Je moet minstens de rang Thief hebben om aan een Organised Crime mee te doen.</p>';
 } elseif ($rust > 0 && $oc === null) {
     echo '<p>Je bent nog aan het uitrusten van je vorige overval. Nog '
        . '<strong data-tot="' . (time() + $rust) . '">' . e(duration($rust)) . '</strong>.</p>';
