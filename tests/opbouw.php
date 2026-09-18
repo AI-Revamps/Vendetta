@@ -347,6 +347,17 @@ $hitlistHtml = haal('hitlist.php')['body'];
 check('premielijst toont rangen, geen kale ervaringsgetallen',
     str_contains($hitlistHtml, 'Godfather') && !str_contains($hitlistHtml, '20.000 en hoger'));
 
+$trouwenHtml = haal('getmarried.php')['body'];
+check('trouwpagina noemt geen percentage of ervaringsgetal',
+    !str_contains($trouwenHtml, '% van de') && !preg_match('/\d[\d.]*\s*ervaring/', $trouwenHtml));
+check('trouwpagina noemt wel de vereiste rang', str_contains($trouwenHtml, 'Thief'));
+
+$famStichtenHtml = haal('fam.php?p=new')['body'];
+check('familie-stichtpagina noemt geen percentage of ervaringsgetal',
+    !str_contains($famStichtenHtml, '% van de') && !preg_match('/\d[\d.]*\s*ervaring/', $famStichtenHtml));
+check('familie-stichtpagina noemt wel de vereiste rang',
+    str_contains($famStichtenHtml, 'Local Chief'));
+
 $db->exec("UPDATE users SET xp = 5000 WHERE login = 'Speler'");
 
 samenvatting();
